@@ -39,22 +39,41 @@ public class Player implements Collidable,VisibleGrafix {
 				retPoly.addPoint(x, y+500);
 			}
 			else {
-				retPoly.addPoint(x, y+30);
-				retPoly.addPoint(x+350, y+30);
+				retPoly.addPoint(x+220, y+30);
+				retPoly.addPoint(x+280, y+30);
+				retPoly.addPoint(x+280, y+135);
+				retPoly.addPoint(x+350, y+150);
 				retPoly.addPoint(x+350, y+280);
 				retPoly.addPoint(x+275, y+500);
 				retPoly.addPoint(x+350, y+530);
 				retPoly.addPoint(x+350, y+600);
 				retPoly.addPoint(x, y+600);
+				retPoly.addPoint(x, y+135);
+				retPoly.addPoint(x+165, y+135);
+				retPoly.addPoint(x+165, y+80);
 			}
 		}
 		else {
-			retPoly.addPoint(x, y+30);
-			retPoly.addPoint(x+350, y+30);
+			retPoly.addPoint(x+220, y+30);
+			
+			retPoly.addPoint(x+280, y+30);
+			retPoly.addPoint(x+280, y+135);
+			retPoly.addPoint(x+350, y+150);//Rechter ellenbogen
 			retPoly.addPoint(x+350, y+260);
-			retPoly.addPoint(x+337, y+480);
+			retPoly.addPoint(x+337, y+480);//Vorderrad
+			retPoly.addPoint(x+305, y+495);
+			retPoly.addPoint(x+250, y+455);
+			retPoly.addPoint(x+105, y+505);
+			retPoly.addPoint(x+110, y+550);
 			retPoly.addPoint(x+78, y+570);
-			retPoly.addPoint(x+0, y+520);
+			retPoly.addPoint(x+60, y+560);
+			retPoly.addPoint(x+50, y+520);
+			retPoly.addPoint(x+10, y+530);
+			retPoly.addPoint(x+0, y+520);//Linke Fuﬂspitze
+			retPoly.addPoint(x+0, y+360);
+			retPoly.addPoint(x+55, y+135);
+			retPoly.addPoint(x+170, y+135);
+			retPoly.addPoint(x+170, y+70);
 		}
 		return retPoly;
 	}
@@ -108,6 +127,8 @@ public class Player implements Collidable,VisibleGrafix {
 	}
 
 	public int getSpeedRight() {
+		if(getState().equals(PlayerStateEnum.BRAKING))
+			return speedRight/2;
 		return speedRight;
 	}
 

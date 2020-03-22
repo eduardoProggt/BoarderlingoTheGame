@@ -36,7 +36,7 @@ public class Pipe extends Opstacle{
 	}
 
 	@Override
-	public void moveRight() {
+	public void moveRight(int speed) {
 		getLocation().x = getLocation().x -speed;
 	}
 

@@ -17,6 +17,7 @@ public class Background implements VisibleGrafix {
 	}
 
 	public Point getLocation() {
+		location.x = location.x % 1000 +1000;
 		return location;
 	}
 
