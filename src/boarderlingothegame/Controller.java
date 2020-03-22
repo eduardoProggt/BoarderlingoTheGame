@@ -18,6 +18,9 @@ public class Controller {
         
         if(keyEvent.getKeyCode()==KeyEvent.VK_SPACE)
     		updatePressed(ButtonsEnum.SPACE);
+        
+        if(keyEvent.getKeyCode()==KeyEvent.VK_R)
+    		updatePressed(ButtonsEnum.SPECIAL);
     }
 
 	public void buttonUp(KeyEvent keyEvent) {
@@ -31,6 +34,9 @@ public class Controller {
     
     if(keyEvent.getKeyCode()==KeyEvent.VK_SPACE)
 		updateReleased(ButtonsEnum.SPACE);
+    
+    if(keyEvent.getKeyCode()==KeyEvent.VK_R)
+		updateReleased(ButtonsEnum.SPECIAL);
     }
 	
 	public boolean isPressed(ButtonsEnum button) {

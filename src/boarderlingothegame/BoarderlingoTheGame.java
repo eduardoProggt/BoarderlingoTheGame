@@ -2,6 +2,8 @@
 package boarderlingothegame;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.event.*;
@@ -14,7 +16,7 @@ class GamePanel extends JPanel implements ActionListener {
 	Controller controller = new Controller();
 	UserInputFassade userInput = new UserInputFassade(controller);
 	Background background = new Background(695,535);
-	Queue<Opstacle> opstacles = new LinkedList<>(); 
+	List<Opstacle> opstacles = new ArrayList(); 
 	Player player = new Player();
 	
 	private int timeSeitJump = 0;
@@ -29,9 +31,25 @@ class GamePanel extends JPanel implements ActionListener {
 		
 		addKeyListener(userInput.getKeyListener());
 	}
-
+	
+	private void reset() {
+		opstacles = new ArrayList();
+		opstacles.add(new Pipe());
+		opstacles.add(new Heli());
+		player = new Player();
+		controller.resetButtons();
+		timeSeitJump = 0;
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 		autoScroll();
+		
+		//_________DEBUG_________
+		if(controller.isPressed(ButtonsEnum.SPECIAL)) {
+			addPipe();
+			addHeli();
+		}
+		//_________DEBUG_________
 		
 		if (controller.isPressed(ButtonsEnum.LEFT))
 			player.setState(PlayerStateEnum.BRAKING);
@@ -48,27 +66,37 @@ class GamePanel extends JPanel implements ActionListener {
 		else if(player.getState().equals(PlayerStateEnum.DUCKING)){
 			player.setState(PlayerStateEnum.IDLE);
 		}
-//		Area areaPlayer = new Area(player.getHitBox());
-//		Area areaPipe = new Area(testPipe.getHitBox());
-//		areaPlayer.intersect(areaPipe);
-//		if(!areaPlayer.isEmpty()) {
-		for(Opstacle eObst : opstacles) {
-		if(player.getHitBox().contains(eObst.getLocation()) 
-				|| player.getHitBox().contains(eObst.getLocation().getX()+130 ,eObst.getLocation().getY())
-				|| player.getHitBox().contains(eObst.getLocation().getX(),eObst.getLocation().getY()+100) 
-				|| player.getHitBox().contains(eObst.getLocation().getX()+150,eObst.getLocation().getY()+100) 
-				) {
-			JOptionPane.showMessageDialog(null,"AUA (Gelähmt gar quer)");
-			opstacles = new LinkedList<>();
-			opstacles.add(new Pipe());
-			opstacles.add(new Heli());
-			player = new Player();
-			controller.resetButtons();
-			timeSeitJump = 0;
 		
-		}}
+		
+//		for(Opstacle eObst : opstacles) {
+//		if(player.getHitBox().contains(eObst.getLocation()) 
+//				|| player.getHitBox().contains(eObst.getLocation().getX()+130 ,eObst.getLocation().getY())
+//				|| player.getHitBox().contains(eObst.getLocation().getX(),eObst.getLocation().getY()+100) 
+//				|| player.getHitBox().contains(eObst.getLocation().getX()+150,eObst.getLocation().getY()+100) 
+//				) {
+//			int i=3;
+//		
+//		}}	
+		
+		
+  		Area areaPlayer = new Area(player.getHitBox());
+		Area areaObstacle;
+		for(Opstacle eObst : opstacles) {
+			areaObstacle = new Area(eObst.getHitBox());
+			areaPlayer.intersect(areaObstacle);
+ 			if(!areaPlayer.isEmpty()) {
+ 				JOptionPane.showMessageDialog(null,"AUA (Gelähmt gar quer)");
+ 				reset();
+ 			}
+		}
+		
+		
+	
+
 		incrementEachFrameNumber++;
 	}
+
+
 
 
 	private void calcJumpFrame() {
@@ -110,6 +138,8 @@ class GamePanel extends JPanel implements ActionListener {
 		
 		for(Opstacle eObst : opstacles) {
 			g2d.drawImage(eObst.getImage(incrementEachFrameNumber),eObst.getLocation().x,eObst.getLocation().y,this);
+			g2d.drawPolygon(eObst.getHitBox());
+			g2d.drawPolygon(player.getHitBox());
 		}
 		repaint();
 	} 
@@ -127,16 +157,16 @@ class GamePanel extends JPanel implements ActionListener {
 		
 		background.getLocation().x += player.getSpeedRight(); 
 
-		
+		List<Opstacle> despawn = new ArrayList<Opstacle>();
 		for(Opstacle eObst : opstacles) {
 			if(eObst.getLocation().x > -150)
 				eObst.moveRight();
+			else despawn.add(eObst);
 		}
-		if(opstacles.peek()!= null &&opstacles.peek().getLocation().x<-150) {
-			opstacles.poll();
-		}
+		opstacles.removeAll(despawn);
 
 		background.getLocation().x = background.getLocation().x%1000 +1000;
+		System.out.println(opstacles.size());
 	}
 
 	public void addPipe() {

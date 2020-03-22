@@ -25,8 +25,8 @@ public class Pipe extends Opstacle{
 		Polygon retPol = new Polygon();
 		retPol.addPoint(getLocation().x, getLocation().y);
 		retPol.addPoint(getLocation().x+130, getLocation().y);
-		retPol.addPoint(getLocation().x+130, getLocation().y+Integer.MAX_VALUE);
-		retPol.addPoint(getLocation().x, getLocation().y+Integer.MAX_VALUE);
+		retPol.addPoint(getLocation().x+130, getLocation().y+200);
+		retPol.addPoint(getLocation().x, getLocation().y+200);
 		return retPol;
 	}
 
