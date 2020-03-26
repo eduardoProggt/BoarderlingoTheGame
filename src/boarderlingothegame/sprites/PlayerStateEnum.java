@@ -1,4 +1,4 @@
-package boarderlingothegame;
+package boarderlingothegame.sprites;
 
 public enum PlayerStateEnum {
 	JUMPING,

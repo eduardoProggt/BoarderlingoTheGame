@@ -9,6 +9,17 @@ import java.util.Random;
 
 import javax.swing.*;
 import javax.swing.Timer;
+
+import boarderlingothegame.controller.ButtonsEnum;
+import boarderlingothegame.controller.Controller;
+import boarderlingothegame.controller.UserInputFassade;
+import boarderlingothegame.sprites.GfxLoader;
+import boarderlingothegame.sprites.Heli;
+import boarderlingothegame.sprites.Opstacle;
+import boarderlingothegame.sprites.Pipe;
+import boarderlingothegame.sprites.Player;
+import boarderlingothegame.sprites.PlayerStateEnum;
+
 import java.awt.event.*;
 import java.awt.geom.Area;
 
@@ -17,47 +28,40 @@ class GamePanel extends JPanel implements ActionListener {
 	Controller controller = new Controller();
 	UserInputFassade userInput = new UserInputFassade(controller);
 	Background background = new Background(695,535);
-	List<Opstacle> opstacles = new ArrayList<Opstacle>(); 
-	Player player = new Player();
+	AnimationTimer animationTimer = new AnimationTimer();
+	List<Opstacle> opstacles; 
+	Player player;
 	private boolean offline;
 	
-	private int score,highscore;
-	private int timeSeitJump = 0;
+	private int highscore;
 	private Timer time;
-	int sprunghoehe=260;
 
-	int incrementEachFrameNumber = 0;
-	private int speedupTime = 0;
-	private int nebelTime = 0;
-
-	GamePanel(boolean isOnTwitch) {
+	/*package*/ GamePanel(boolean isOnTwitch) {
 		setLayout(null);
 		time = new Timer(30, this); // starting a timer and passing the
 		time.start();		    	// actionlistener for the animation
 		offline = !isOnTwitch;
-		
-		
+	
 		addKeyListener(userInput.getKeyListener());
+		animationTimer.startAnimation("SCORE");
+		reset();
 	}
 	
 	private void reset() {
-		if(score> highscore)
-			highscore= score;
-		score = 0;
+		if(animationTimer.getFrame("SCORE")> highscore)
+			highscore= animationTimer.getFrame("SCORE");
+		animationTimer.startAnimation("SCORE");
 		opstacles = new ArrayList<Opstacle>();
 		player = new Player();
 		controller.resetButtons();
-		timeSeitJump = 0;
 	}
 	
 	public void actionPerformed(ActionEvent e) {
 		autoScroll();
 		
-		//_________DEBUG_________
 		if(controller.isPressed(ButtonsEnum.SPECIAL)) {
 			highscore = 0;
 		}
-		//_________DEBUG_________
 		
 		if (controller.isPressed(ButtonsEnum.LEFT) && !player.isInAir())
 			player.setState(PlayerStateEnum.BRAKING);
@@ -77,30 +81,20 @@ class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		opstacles.stream().forEach(this::collisionDetection);
-
-		if(speedupTime > 0) {
-			speedupTime --;
-		}
-		if(nebelTime > 0) {
-			nebelTime --;
-		}
-		score++;
-		incrementEachFrameNumber++;
+		animationTimer.increment();
 	}
 
 	private void collisionDetection(Opstacle eObst) {
 		if( eObst.getHitBox().intersects(player.getHitBox().getBounds()) ){
-		    Area a = new Area(eObst.getHitBox());
-		    a.intersect(new Area(player.getHitBox()));
-		    if(!a.isEmpty()){
+		    Area collision = new Area(eObst.getHitBox());
+		    collision.intersect(new Area(player.getHitBox()));
+		    if(!collision.isEmpty()){
 				JOptionPane.showMessageDialog(null,"AUA (Gelähmt gar quer)");
 				reset();
 				return;
 		    }
 		}
 	}
-
-
 
 
 	private void calcJumpFrame() {
@@ -121,8 +115,6 @@ class GamePanel extends JPanel implements ActionListener {
 
 	}
 
-
-
 	public void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
@@ -132,26 +124,29 @@ class GamePanel extends JPanel implements ActionListener {
 		setFocusable(true);
 
 		g2d.drawImage(background.getImage(0), 700 - background.getLocation().x, 0, null); 
-		g2d.drawImage(player.getImage(incrementEachFrameNumber), (int)player.getX(), (int)player.getY(), this);
+		g2d.drawImage(player.getImage(animationTimer.getFrame()), (int)player.getX(), (int)player.getY(), this);
 		g2d.setFont(new Font(null, 2, 40));
 		
 		for(Opstacle eObst : opstacles) {
-			g2d.drawImage(eObst.getImage(incrementEachFrameNumber),eObst.getLocation().x,eObst.getLocation().y,this);
+			g2d.drawImage(eObst.getImage(animationTimer.getFrame()),eObst.getLocation().x,eObst.getLocation().y,this);
 			//g2d.drawPolygon(eObst.getHitBox());
 			g2d.drawString(eObst.getSpawnedBy(), eObst.getLocation().x,eObst.getLocation().y);
 		}
-		if(nebelTime > 550)
-			g2d.drawImage(GfxLoader.nebel, 500+(nebelTime-550)*25,0, this);
-		else if(nebelTime<=550 && nebelTime >= 50) {
-			g2d.drawImage(GfxLoader.nebel, 500,0, this);
+		//TODO Refactor this stuff:
+		if(animationTimer.getFrame("NEBEL") != null) {
+			int nebelTime = animationTimer.getFrame("NEBEL").intValue();
+			if(nebelTime > 550)
+				g2d.drawImage(GfxLoader.nebel, 500+(nebelTime-550)*25,0, this);
+			else if(nebelTime<=550 && nebelTime >= 50) {
+				g2d.drawImage(GfxLoader.nebel, 500,0, this);
+			}
+			else if(nebelTime > 0){
+				g2d.drawImage(GfxLoader.nebel, 500+(50-nebelTime)*25,0, this);
+			}
 		}
-		else if(nebelTime > 0){
-			g2d.drawImage(GfxLoader.nebel, 500+(50-nebelTime)*25,0, this);
-		}
+		// </TODO>
 		
-		// g2d.drawPolygon(player.getHitBox());
-		
-		g2d.drawString("Score: \n "+score, 0, 40);
+		g2d.drawString("Score: \n "+animationTimer.getFrame("SCORE"), 0, 40);
 		g2d.drawString("Highscore: \n "+highscore, 0, 80);
 		
 		repaint();
@@ -172,7 +167,7 @@ class GamePanel extends JPanel implements ActionListener {
 			setRandomObstacles();
 		
 		int factor = 1;
-		if(speedupTime>0)
+		if(animationTimer.getFrame("SPEED")<150)
 			factor = 2;
 		
 		background.getLocation().x += player.getSpeedRight()*factor; 
@@ -198,31 +193,25 @@ class GamePanel extends JPanel implements ActionListener {
 		Random wuerfel = new Random();
 		if(wuerfel.nextInt() %100 == 0)
 			addPipe("AUTO");
-//		if(wuerfel.nextInt() %180 == 0)
-//			addHeli("AUTO");
-//		if(wuerfel.nextInt() %900 == 0)
-//			speedUp();
-//		if(wuerfel.nextInt() %1400 == 0)
-//			setFog();
+		if(wuerfel.nextInt() %180 == 0)
+			addHeli("AUTO");
+		if(wuerfel.nextInt() %1000 == 0)
+			speedUp();
+		if(wuerfel.nextInt() %1500 == 0)
+			setFog();
 	}
 
 	public void addPipe(String string) {
-
 		opstacles.add(new Pipe(string));
 	}
 	public void addHeli(String string) {
-
 		opstacles.add(new Heli(string));
 	}
-
 	public void speedUp() {
-		speedupTime  = 150;
-		
+		animationTimer.startAnimation("SPEED");
 	}
-
 	public void setFog() {
-		nebelTime = 600;
-		
+		animationTimer.startAnimation("NEBEL");
 	}
 }
 
@@ -230,13 +219,12 @@ public class BoarderlingoTheGame extends JFrame {
 
 	GamePanel gp = null;
 
-	BoarderlingoTheGame(boolean isOnTwitch) {
+	public BoarderlingoTheGame(boolean isOnTwitch) {
 		gp= new GamePanel(isOnTwitch);
 		add(gp);
 		setSize(1500, 800);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
-
 	}
 
 	public static void main(String[] args) {
@@ -244,19 +232,15 @@ public class BoarderlingoTheGame extends JFrame {
 	}
 
 
-
 	public void handleTwitchMessage(String message) {
 		if(message.toUpperCase().contains("KAKTUS"))
 			gp.addPipe(message.split(" ")[0]);
 		if(message.toUpperCase().contains("HELI"))
 			gp.addHeli(message.split(" ")[0]);
-		if(message.toUpperCase().contains("SCHNELLER")) {
+		if(message.toUpperCase().contains("SCHNELLER")) 
 			gp.speedUp();
-		}
-		if(message.toUpperCase().contains("NEBEL")) {
+		if(message.toUpperCase().contains("NEBEL")) 
 			gp.setFog();
-		}
-		
 	}
 }
 

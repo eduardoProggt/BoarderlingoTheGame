@@ -1,4 +1,4 @@
-package boarderlingothegame;
+package boarderlingothegame.sprites;
 
 import java.awt.Image;
 import java.awt.Point;
@@ -8,7 +8,7 @@ public class Heli extends Opstacle {
 
 	int speed;
 	
-	Heli(String spawnedBy){
+	public Heli(String spawnedBy){
 		super(spawnedBy);
 		location = new Point(2000,100);
 		speed = 10;

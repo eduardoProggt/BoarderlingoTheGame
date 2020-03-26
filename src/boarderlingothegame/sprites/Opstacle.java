@@ -1,4 +1,4 @@
-package boarderlingothegame;
+package boarderlingothegame.sprites;
 
 import java.awt.Image;
 import java.awt.Rectangle;

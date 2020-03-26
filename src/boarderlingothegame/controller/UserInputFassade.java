@@ -1,4 +1,4 @@
-package boarderlingothegame;
+package boarderlingothegame.controller;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -7,7 +7,7 @@ public class UserInputFassade {
 	
 	Controller controller;
 	
-	UserInputFassade(Controller _controller){
+	public UserInputFassade(Controller _controller){
 		controller = _controller;
 	}
 	

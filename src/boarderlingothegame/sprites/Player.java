@@ -1,4 +1,4 @@
-package boarderlingothegame;
+package boarderlingothegame.sprites;
 
 import java.awt.Image;
 import java.awt.Point;
@@ -15,14 +15,14 @@ public class Player implements Collidable,VisibleGrafix {
 	private PlayerStateEnum state;
 	private int speedRight;
 
-	Player(){
+	public Player(){
 		setX(150);
 		setY(80);
 		setState(PlayerStateEnum.IDLE);
 		setSpeedRight(DEFAULT_SPEED);
 	}
 
-	boolean isInAir() {
+	public boolean isInAir() {
 		return getState().equals(PlayerStateEnum.JUMPING) 
 		    || getState().equals(PlayerStateEnum.FALLING);
 	}

@@ -1,4 +1,4 @@
-package boarderlingothegame;
+package boarderlingothegame.sprites;
 
 import java.awt.Image;
 import java.awt.Point;
@@ -8,7 +8,7 @@ public class Pipe extends Opstacle{
 
 	int speed;
 	
-	Pipe(String spawnedBy){
+	public Pipe(String spawnedBy){
 		super(spawnedBy);
 		location = new Point(2000,500);
 		speed  = 20;

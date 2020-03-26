@@ -3,6 +3,9 @@ package boarderlingothegame;
 import java.awt.Image;
 import java.awt.Point;
 
+import boarderlingothegame.sprites.GfxLoader;
+import boarderlingothegame.sprites.VisibleGrafix;
+
 public class Background implements VisibleGrafix {
 
 	private Point location;

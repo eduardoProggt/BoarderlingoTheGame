@@ -1,4 +1,4 @@
-package boarderlingothegame;
+package boarderlingothegame.controller;
 
 import java.awt.event.KeyEvent;
 import java.util.HashMap;

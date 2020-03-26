@@ -1,4 +1,4 @@
-package boarderlingothegame;
+package boarderlingothegame.sprites;
 
 import java.awt.Point;
 import java.awt.Polygon;
