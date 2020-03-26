@@ -9,7 +9,8 @@ import java.awt.geom.Area;
 public class Player implements Collidable,VisibleGrafix {
 	private final int DEFAULT_SPEED = 16; 
 	
-	private int x,y;
+	private double x,y, horizontalMomentum;
+	
 	
 	private PlayerStateEnum state;
 	private int speedRight;
@@ -30,6 +31,8 @@ public class Player implements Collidable,VisibleGrafix {
 	public Polygon getHitBox() {
 		
 		Polygon retPoly = new Polygon();
+		int x = (int)getX();
+		int y = (int)getY();
 		if(!isInAir()) {
 			if(getState().equals(PlayerStateEnum.DUCKING))
 			{//TODO nochmal ordentlich
@@ -79,7 +82,7 @@ public class Player implements Collidable,VisibleGrafix {
 	}
 	@Override
 	public Point getLocation() {
-		return new Point(getX(),getY());
+		return new Point((int)getX(),(int)getY());
 	} 
 	@Override
 	public Image getImage(int counterVariable) {
@@ -103,7 +106,7 @@ public class Player implements Collidable,VisibleGrafix {
 		return  GfxLoader.idle_right1; //Default
 	}
 	
-	public int getX() {
+	public double getX() {
 		return x;
 	}
 
@@ -111,12 +114,12 @@ public class Player implements Collidable,VisibleGrafix {
 		this.x = x;
 	}
 
-	public int getY() {
+	public double getY() {
 		return y;
 	}
 
-	public void setY(int y) {
-		this.y = y;
+	public void setY(double d) {
+		this.y = d;
 	}
 	public PlayerStateEnum getState() {
 		return state;
@@ -136,4 +139,19 @@ public class Player implements Collidable,VisibleGrafix {
 		this.speedRight = speedRight;
 	}
 
+	public double getHorizontalMomentum() {
+		return horizontalMomentum;
+	}
+
+	public void setHorizontalMomentum(int horizontalMomentum) {
+		this.horizontalMomentum = horizontalMomentum;
+	}
+	public void decreaseHorizontalMomentum(double d) {
+		horizontalMomentum -= d;
+	}
+
+	public void applyHorizontalMomentum(double i) {
+		horizontalMomentum += i;
+		
+	}
 }

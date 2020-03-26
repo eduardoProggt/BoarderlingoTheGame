@@ -3,7 +3,10 @@ package boarderlingothegame;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.event.*;
@@ -16,19 +19,23 @@ class GamePanel extends JPanel implements ActionListener {
 	Background background = new Background(695,535);
 	List<Opstacle> opstacles = new ArrayList<Opstacle>(); 
 	Player player = new Player();
+	private boolean offline;
 	
 	private int score,highscore;
 	private int timeSeitJump = 0;
 	private Timer time;
+	int sprunghoehe=260;
 
 	int incrementEachFrameNumber = 0;
 	private int speedupTime = 0;
 	private int nebelTime = 0;
 
-	GamePanel() {
+	GamePanel(boolean isOnTwitch) {
 		setLayout(null);
 		time = new Timer(30, this); // starting a timer and passing the
 		time.start();		    	// actionlistener for the animation
+		offline = !isOnTwitch;
+		
 		
 		addKeyListener(userInput.getKeyListener());
 	}
@@ -38,8 +45,6 @@ class GamePanel extends JPanel implements ActionListener {
 			highscore= score;
 		score = 0;
 		opstacles = new ArrayList<Opstacle>();
-		opstacles.add(new Pipe());
-		opstacles.add(new Heli());
 		player = new Player();
 		controller.resetButtons();
 		timeSeitJump = 0;
@@ -50,8 +55,7 @@ class GamePanel extends JPanel implements ActionListener {
 		
 		//_________DEBUG_________
 		if(controller.isPressed(ButtonsEnum.SPECIAL)) {
-			addPipe();
-			setFog();
+			highscore = 0;
 		}
 		//_________DEBUG_________
 		
@@ -63,6 +67,7 @@ class GamePanel extends JPanel implements ActionListener {
 			calcJumpFrame();
 		else if(controller.isPressed(ButtonsEnum.SPACE)) {
 			jump();
+			controller.resetButtons();//TODO TEST
 		}
 		else if(controller.isPressed(ButtonsEnum.DOWN)) {
 			player.setState(PlayerStateEnum.DUCKING);
@@ -100,28 +105,22 @@ class GamePanel extends JPanel implements ActionListener {
 
 	private void calcJumpFrame() {
 		int bodenhoehe = 80;
-		int sprunghoehe=-50;
-
-		double x = timeSeitJump;
-		if(player.isInAir()) {
-			int newCalcedJumpYValue= bodenhoehe-1-(int)Math.round(-0.6*(x*x)+25*x);
-			player.setY(newCalcedJumpYValue);
-		}
-
-		if(player.getY() < sprunghoehe && player.getState().equals(PlayerStateEnum.JUMPING))
+		player.setY(player.getY()+player.getHorizontalMomentum());
+		player.decreaseHorizontalMomentum(-1.8);
+		
+		if(controller.isPressed(ButtonsEnum.SPACE) && player.getState().equals(PlayerStateEnum.JUMPING)) {
 			player.setState(PlayerStateEnum.FALLING);
-		if(player.getState().equals(PlayerStateEnum.FALLING))
-		{
-			//Joah, was eigentlich?
+			player.setHorizontalMomentum(-16);
+		}
+		
+		if(player.getY()>bodenhoehe) {
+			player.setY(bodenhoehe);
+			player.setHorizontalMomentum(0);
+			player.setState(PlayerStateEnum.IDLE);
 		}
 
-		if(player.getY() >= bodenhoehe)
-		{
-			player.setState(PlayerStateEnum.IDLE);
-			timeSeitJump = 0;
-		}
-		timeSeitJump++;
 	}
+
 
 
 	public void paintComponent(Graphics g) {
@@ -133,12 +132,13 @@ class GamePanel extends JPanel implements ActionListener {
 		setFocusable(true);
 
 		g2d.drawImage(background.getImage(0), 700 - background.getLocation().x, 0, null); 
-		g2d.drawImage(player.getImage(incrementEachFrameNumber), player.getX(), player.getY(), this);
+		g2d.drawImage(player.getImage(incrementEachFrameNumber), (int)player.getX(), (int)player.getY(), this);
+		g2d.setFont(new Font(null, 2, 40));
 		
 		for(Opstacle eObst : opstacles) {
 			g2d.drawImage(eObst.getImage(incrementEachFrameNumber),eObst.getLocation().x,eObst.getLocation().y,this);
-			g2d.drawPolygon(eObst.getHitBox());
-			g2d.drawPolygon(player.getHitBox());
+			//g2d.drawPolygon(eObst.getHitBox());
+			g2d.drawString(eObst.getSpawnedBy(), eObst.getLocation().x,eObst.getLocation().y);
 		}
 		if(nebelTime > 550)
 			g2d.drawImage(GfxLoader.nebel, 500+(nebelTime-550)*25,0, this);
@@ -149,8 +149,8 @@ class GamePanel extends JPanel implements ActionListener {
 			g2d.drawImage(GfxLoader.nebel, 500+(50-nebelTime)*25,0, this);
 		}
 		
+		// g2d.drawPolygon(player.getHitBox());
 		
-		g2d.setFont(new Font(null, 2, 40));
 		g2d.drawString("Score: \n "+score, 0, 40);
 		g2d.drawString("Highscore: \n "+highscore, 0, 80);
 		
@@ -158,20 +158,25 @@ class GamePanel extends JPanel implements ActionListener {
 	} 
 	void jump() 
 	{
-		if (player.getState() != PlayerStateEnum.JUMPING) // For upward motion during jump
+		if (player.getState() == PlayerStateEnum.JUMPING)
+			return;
 			player.setState(PlayerStateEnum.JUMPING);
+			player.setHorizontalMomentum(-32);
 
 	}
 
 	void autoScroll() {
 		//DIRTY!
+
+		if(offline) 
+			setRandomObstacles();
+		
 		int factor = 1;
 		if(speedupTime>0)
 			factor = 2;
 		
 		background.getLocation().x += player.getSpeedRight()*factor; 
 
-		List<Opstacle> despawn = new ArrayList<Opstacle>();
 		for(Opstacle eObst : opstacles) {
 			
 			if(eObst.getLocation().x > -150) {
@@ -179,20 +184,35 @@ class GamePanel extends JPanel implements ActionListener {
 					eObst.moveRight(10);
 				eObst.moveRight(player.getSpeedRight()*factor);
 			}
-			else despawn.add(eObst);
 		}
-		
-		opstacles.removeAll(despawn);
-		System.out.println(opstacles.size());
+		for (Iterator<Opstacle> iterator = opstacles.iterator(); iterator.hasNext();) {
+		    Opstacle eObst = iterator.next();
+		    if(eObst.getLocation().x <= -150) {
+		        iterator.remove();
+		    }
+		}
+		System.out.println(player.getState());
 	}
 
-	public void addPipe() {
-
-		opstacles.add(new Pipe());
+	private void setRandomObstacles() {
+		Random wuerfel = new Random();
+		if(wuerfel.nextInt() %100 == 0)
+			addPipe("AUTO");
+//		if(wuerfel.nextInt() %180 == 0)
+//			addHeli("AUTO");
+//		if(wuerfel.nextInt() %900 == 0)
+//			speedUp();
+//		if(wuerfel.nextInt() %1400 == 0)
+//			setFog();
 	}
-	public void addHeli() {
 
-		opstacles.add(new Heli());
+	public void addPipe(String string) {
+
+		opstacles.add(new Pipe(string));
+	}
+	public void addHeli(String string) {
+
+		opstacles.add(new Heli(string));
 	}
 
 	public void speedUp() {
@@ -208,9 +228,10 @@ class GamePanel extends JPanel implements ActionListener {
 
 public class BoarderlingoTheGame extends JFrame {
 
-	GamePanel gp = new GamePanel();
+	GamePanel gp = null;
 
-	BoarderlingoTheGame() {
+	BoarderlingoTheGame(boolean isOnTwitch) {
+		gp= new GamePanel(isOnTwitch);
 		add(gp);
 		setSize(1500, 800);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -219,28 +240,22 @@ public class BoarderlingoTheGame extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		testWithoutServer(new BoarderlingoTheGame());
+		new BoarderlingoTheGame(false);
 	}
 
 
 
 	public void handleTwitchMessage(String message) {
 		if(message.toUpperCase().contains("KAKTUS"))
-			gp.addPipe();
+			gp.addPipe(message.split(" ")[0]);
 		if(message.toUpperCase().contains("HELI"))
-			gp.addHeli();
+			gp.addHeli(message.split(" ")[0]);
 		if(message.toUpperCase().contains("SCHNELLER")) {
 			gp.speedUp();
 		}
 		if(message.toUpperCase().contains("NEBEL")) {
 			gp.setFog();
 		}
-		
-	}
-	
-	private static void testWithoutServer(BoarderlingoTheGame boarderlingoTheGame) {
-		boarderlingoTheGame.handleTwitchMessage("KAKTUS");
-		boarderlingoTheGame.handleTwitchMessage("HELI");
 		
 	}
 }

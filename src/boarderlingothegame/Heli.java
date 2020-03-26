@@ -8,7 +8,8 @@ public class Heli extends Opstacle {
 
 	int speed;
 	
-	Heli(){
+	Heli(String spawnedBy){
+		super(spawnedBy);
 		location = new Point(2000,100);
 		speed = 10;
 	}
