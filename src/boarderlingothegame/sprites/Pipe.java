@@ -4,7 +4,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 
-public class Pipe extends Opstacle{
+public class Pipe extends Obstacle{
 
 	int speed;
 	
@@ -14,7 +14,7 @@ public class Pipe extends Opstacle{
 		speed  = 20;
 	}
 	
-	private Point location;
+	
 	
 	@Override
 	public Point getLocation() {

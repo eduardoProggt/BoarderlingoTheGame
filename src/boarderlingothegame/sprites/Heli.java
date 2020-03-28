@@ -4,7 +4,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 
-public class Heli extends Opstacle {
+public class Heli extends Obstacle {
 
 	int speed;
 	

@@ -15,6 +15,7 @@ public class GfxLoader {
 	public static Image pipe = new ImageIcon(PREFIX+"pipe.png").getImage(); 
 	public static Image heli = new ImageIcon(PREFIX+"Heli.png").getImage(); 
 	public static Image nebel = new ImageIcon(PREFIX+"Nebel.png").getImage(); 
+	public static Image oma = new ImageIcon(PREFIX+"Oma1.png").getImage(); 
 	
 	public static Image player_ducking = new ImageIcon(PREFIX+"blingo_ducking.png").getImage(); 
 }
