@@ -32,8 +32,10 @@ public class Granny extends Obstacle {
 
 	@Override
 	public Image getImage(int frame) {
-		
-		return GfxLoader.oma;
+		if(frame%8<4 && getLocation().x<1000)
+			return GfxLoader.oma1;
+		else
+			return GfxLoader.oma2;
 	}
 
 	@Override

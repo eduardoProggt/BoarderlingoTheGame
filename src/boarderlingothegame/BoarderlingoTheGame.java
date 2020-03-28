@@ -92,8 +92,7 @@ class GamePanel extends JPanel implements ActionListener {
 			    Obstacle eObst = iterator.next();
 			    function.accept(eObst);
 			} catch (Exception exc) {
-				Obstacle eObst = iterator.next();
-				System.out.println(eObst.getSpawnedBy());
+				System.out.println("\u001B[31m" + exc.getMessage() + "\u001B[0m");
 			}
 		}
 	}
@@ -226,15 +225,15 @@ class GamePanel extends JPanel implements ActionListener {
 		Random wuerfel = new Random();
 		int unwahrscheinlichkeitsfaktor = 30;
 		if(wuerfel.nextInt() %(3*unwahrscheinlichkeitsfaktor) == 0)
-			addPipe("AUTO");
-		if(wuerfel.nextInt() %(5*unwahrscheinlichkeitsfaktor) == 0)
-			addHeli("AUTO");
-		if(wuerfel.nextInt() %(20*unwahrscheinlichkeitsfaktor) == 0)
-			speedUp();
-		if(wuerfel.nextInt() %(40*unwahrscheinlichkeitsfaktor) == 0)
-			setFog();
-		if(wuerfel.nextInt() %(60*unwahrscheinlichkeitsfaktor) == 0)
 			addGranny("AUTO");
+//		if(wuerfel.nextInt() %(5*unwahrscheinlichkeitsfaktor) == 0)
+//			addHeli("AUTO");
+//		if(wuerfel.nextInt() %(20*unwahrscheinlichkeitsfaktor) == 0)
+//			speedUp();
+//		if(wuerfel.nextInt() %(40*unwahrscheinlichkeitsfaktor) == 0)
+//			setFog();
+//		if(wuerfel.nextInt() %(60*unwahrscheinlichkeitsfaktor) == 0)
+//			addGranny("AUTO");
 	}
 
 	public synchronized void addPipe(String string) {
