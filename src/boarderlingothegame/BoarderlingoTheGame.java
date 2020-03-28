@@ -73,7 +73,7 @@ class GamePanel extends JPanel implements ActionListener {
 			calcJumpFrame();
 		else if(controller.isPressed(ButtonsEnum.SPACE)) {
 			jump();
-			controller.resetButtons();//TODO TEST
+			controller.resetButtons();
 		}
 		else if(controller.isPressed(ButtonsEnum.DOWN)) {
 			player.setState(PlayerStateEnum.DUCKING);
@@ -83,31 +83,18 @@ class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		doForAllObstacles(this::collisionDetection);
-		
-		
-//		for (Iterator<Obstacle> iterator = opstacles.iterator(); iterator.hasNext();) {
-//			try {
-//		    Obstacle eObst = iterator.next();
-//		    collisionDetection(eObst);
-//		} catch (Exception exc) {
-//			Obstacle eObst = iterator.next();
-//			System.out.println(eObst.getSpawnedBy());
-//		}
-//		}
-		
-		
 		animationTimer.increment();
 	}
 
 	private synchronized void doForAllObstacles(Consumer<Obstacle> function) {
 		for (Iterator<Obstacle> iterator = opstacles.iterator(); iterator.hasNext();) {
 			try {
-		    Obstacle eObst = iterator.next();
-		    function.accept(eObst);
-		} catch (Exception exc) {
-			Obstacle eObst = iterator.next();
-			System.out.println(eObst.getSpawnedBy());
-		}
+			    Obstacle eObst = iterator.next();
+			    function.accept(eObst);
+			} catch (Exception exc) {
+				Obstacle eObst = iterator.next();
+				System.out.println(eObst.getSpawnedBy());
+			}
 		}
 	}
 
@@ -138,10 +125,8 @@ class GamePanel extends JPanel implements ActionListener {
 		if(player.getY()>bodenhoehe) {
 			player.setY(bodenhoehe);
 			player.setHorizontalMomentum(0);
-			player.setState(PlayerStateEnum.IDLE);
-			
+			player.setState(PlayerStateEnum.IDLE);			
 		}
-
 	}
 
 	public void paintComponent(Graphics g) {
@@ -158,7 +143,6 @@ class GamePanel extends JPanel implements ActionListener {
 		
 		doForAllObstacles(e-> this.drawObstacles(g2d,e));
 		
-		//drawObstacles(g2d);
 		//TODO Refactor this stuff:
 		if(animationTimer.getFrame("NEBEL") != null) {
 			int nebelTime = animationTimer.getFrame("NEBEL").intValue();
@@ -212,11 +196,8 @@ class GamePanel extends JPanel implements ActionListener {
 		
 		background.getLocation().x += player.getSpeedRight()*factor; 
 
-		//for(Obstacle eObst : opstacles) {
 		final int f = factor;
 		doForAllObstacles(eObst -> moveObstacles(f, eObst));	
-			
-		//}
 		removeInvalidObjects();
 	}
 
@@ -241,8 +222,6 @@ class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 
-	
-	
 	private void setRandomObstacles() {
 		Random wuerfel = new Random();
 		int unwahrscheinlichkeitsfaktor = 30;
