@@ -14,11 +14,12 @@ import javax.swing.Timer;
 import boarderlingothegame.controller.ButtonsEnum;
 import boarderlingothegame.controller.Controller;
 import boarderlingothegame.controller.UserInputFassade;
+import boarderlingothegame.sprites.Fog;
 import boarderlingothegame.sprites.GfxLoader;
 import boarderlingothegame.sprites.Granny;
 import boarderlingothegame.sprites.Heli;
 import boarderlingothegame.sprites.Obstacle;
-import boarderlingothegame.sprites.Pipe;
+import boarderlingothegame.sprites.Cactus;
 import boarderlingothegame.sprites.Player;
 import boarderlingothegame.sprites.PlayerStateEnum;
 
@@ -30,8 +31,7 @@ class GamePanel extends JPanel implements ActionListener {
 	Controller controller = new Controller();
 	UserInputFassade userInput = new UserInputFassade(controller);
 	Background background = new Background(695,535);
-	AnimationTimer animationTimer = new AnimationTimer();
-	List<Obstacle> opstacles; 
+	Fog fog;
 	Player player;
 	private boolean offline;
 	
@@ -45,19 +45,21 @@ class GamePanel extends JPanel implements ActionListener {
 		offline = !isOnTwitch;
 	
 		addKeyListener(userInput.getKeyListener());
-		animationTimer.startAnimation("SCORE");
+		AnimationTimer.getInstance().startAnimation("SCORE");
 		reset();
 	}
 	
 	private void reset() {
+		AnimationTimer animationTimer = AnimationTimer.getInstance();
 		if(animationTimer.getFrame("SCORE")> highscore)
 			highscore= animationTimer.getFrame("SCORE");
 		animationTimer.startAnimation("SCORE");
-		opstacles = new ArrayList<Obstacle>();
+		ObstacleController.getInstance().reset();
 		player = new Player();
 		controller.resetButtons();
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		autoScroll();
 		
@@ -82,35 +84,28 @@ class GamePanel extends JPanel implements ActionListener {
 			player.setState(PlayerStateEnum.IDLE);
 		}
 		
-		doForAllObstacles(this::collisionDetection);
-		animationTimer.increment();
+		ObstacleController.getInstance().collide(player.getHitBox());
+		if(ObstacleController.getInstance().isCollided)
+			{reset();
+			ObstacleController.getInstance().isCollided=false;}
+		AnimationTimer.getInstance().increment();
+	}
+	void autoScroll() {
+		//DIRTY!
+
+		if(offline) 
+			setRandomObstacles();
+		
+		int factor = 1;
+		if(AnimationTimer.getInstance().getFrame("SPEED")<150)
+			factor = 2;
+		
+		background.getLocation().x += player.getSpeedRight()*factor; 
+		ObstacleController.getInstance().autoScroll(factor,player.getSpeedRight());
+
 	}
 
-	private synchronized void doForAllObstacles(Consumer<Obstacle> function) {
-		for (Iterator<Obstacle> iterator = opstacles.iterator(); iterator.hasNext();) {
-			try {
-			    Obstacle eObst = iterator.next();
-			    function.accept(eObst);
-			} catch (Exception exc) {
-				System.out.println("\u001B[31m" + exc.getMessage() + "\u001B[0m");
-			}
-		}
-	}
-
-	private void collisionDetection(Obstacle eObst) {
-		if( eObst.getHitBox().intersects(player.getHitBox().getBounds()) ){
-		    Area collision = new Area(eObst.getHitBox());
-		    collision.intersect(new Area(player.getHitBox()));
-		    if(!collision.isEmpty()){
-				JOptionPane.showMessageDialog(null,"AUA (Gelähmt gar quer)");
-				System.out.println(eObst.getSpawnedBy());
-				reset();
-				return;
-		    }
-		}
-	}
-
-
+	
 	private void calcJumpFrame() {
 		int bodenhoehe = 80;
 		player.setY(player.getY()+player.getHorizontalMomentum());
@@ -127,7 +122,8 @@ class GamePanel extends JPanel implements ActionListener {
 			player.setState(PlayerStateEnum.IDLE);			
 		}
 	}
-
+	
+	@Override
 	public void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
@@ -137,43 +133,19 @@ class GamePanel extends JPanel implements ActionListener {
 		setFocusable(true);
 
 		g2d.drawImage(background.getImage(0), 700 - background.getLocation().x, 0, null); 
-		g2d.drawImage(player.getImage(animationTimer.getFrame()), (int)player.getX(), (int)player.getY(), this);
+		g2d.drawImage(player.getImage(AnimationTimer.getInstance().getFrame()), (int)player.getX(), (int)player.getY(), this);
 		g2d.setFont(new Font(null, 2, 40));
+		ObstacleController.getInstance().draw(g2d, this);//TODO, das ist seeeeehr hässlich
 		
-		doForAllObstacles(e-> this.drawObstacles(g2d,e));
+		if(fog != null && fog.getLocation() != null)
+			g2d.drawImage(fog.getImage(0), fog.getLocation().x,0, this);
 		
-		//TODO Refactor this stuff:
-		if(animationTimer.getFrame("NEBEL") != null) {
-			int nebelTime = animationTimer.getFrame("NEBEL").intValue();
-			if(nebelTime > 550)
-				g2d.drawImage(GfxLoader.nebel, 500+(nebelTime-550)*25,0, this);
-			else if(nebelTime<=550 && nebelTime >= 50) {
-				g2d.drawImage(GfxLoader.nebel, 500,0, this);
-			}
-			else if(nebelTime > 0){
-				g2d.drawImage(GfxLoader.nebel, 500+(50-nebelTime)*25,0, this);
-			}
-		}
-		// </TODO>
-		
-		g2d.drawString("Score: \n "+animationTimer.getFrame("SCORE"), 0, 40);
+		g2d.drawString("Score: \n "+AnimationTimer.getInstance().getFrame("SCORE"), 0, 40);
 		g2d.drawString("Highscore: \n "+highscore, 0, 80);
 		
 		repaint();
 	}
 
-	private void drawObstacles(Graphics2D g2d, Obstacle eObst) {
-		
-			try {
-				g2d.drawImage(eObst.getImage(animationTimer.getFrame()),eObst.getLocation().x,eObst.getLocation().y,this);
-				g2d.drawPolygon(eObst.getHitBox());
-				g2d.drawString(eObst.getSpawnedBy(), eObst.getLocation().x,eObst.getLocation().y);
-			} catch (Exception e) {
-				System.out.println(eObst.getSpawnedBy());
-			}
-
-		
-	} 
 	void jump() 
 	{
 		if (player.getState() == PlayerStateEnum.JUMPING)
@@ -183,73 +155,32 @@ class GamePanel extends JPanel implements ActionListener {
 
 	}
 
-	void autoScroll() {
-		//DIRTY!
-
-		if(offline) 
-			setRandomObstacles();
-		
-		int factor = 1;
-		if(animationTimer.getFrame("SPEED")<150)
-			factor = 2;
-		
-		background.getLocation().x += player.getSpeedRight()*factor; 
-
-		final int f = factor;
-		doForAllObstacles(eObst -> moveObstacles(f, eObst));	
-		removeInvalidObjects();
-	}
-
-	private void moveObstacles(int factor, Obstacle eObst) {
-		if(eObst.getLocation().x > -150) {
-			if (eObst instanceof Heli)
-				eObst.moveRight(10);
-			if (eObst instanceof Granny) {//Dringend refactoren!!
-				((Granny)eObst).moveDown();
-			}
-			eObst.moveRight(player.getSpeedRight()*factor);
-		}
-	}
-
-	private synchronized void removeInvalidObjects() {
-
-		for (Iterator<Obstacle> iterator = opstacles.iterator(); iterator.hasNext();) {
-		    Obstacle eObst = iterator.next();
-		    if(eObst.getLocation().x <= -150) {
-		        iterator.remove();
-		    }
-		}
-	}
 
 	private void setRandomObstacles() {
 		Random wuerfel = new Random();
 		int unwahrscheinlichkeitsfaktor = 30;
 		if(wuerfel.nextInt() %(3*unwahrscheinlichkeitsfaktor) == 0)
-			addGranny("AUTO");
+			ObstacleController.getInstance().add("OMA", "AUTO");
 //		if(wuerfel.nextInt() %(5*unwahrscheinlichkeitsfaktor) == 0)
 //			addHeli("AUTO");
 //		if(wuerfel.nextInt() %(20*unwahrscheinlichkeitsfaktor) == 0)
 //			speedUp();
-//		if(wuerfel.nextInt() %(40*unwahrscheinlichkeitsfaktor) == 0)
-//			setFog();
+		if(wuerfel.nextInt() %(5*unwahrscheinlichkeitsfaktor) == 0)
+			setFog();
 //		if(wuerfel.nextInt() %(60*unwahrscheinlichkeitsfaktor) == 0)
 //			addGranny("AUTO");
 	}
 
-	public synchronized void addPipe(String string) {
-		opstacles.add(new Pipe(string));
-	}
-	public synchronized void addHeli(String string) {
-		opstacles.add(new Heli(string));
-	}
-	public synchronized void addGranny(String string) {
-		opstacles.add(new Granny(string));
-	}
+
 	public void speedUp() {
-		animationTimer.startAnimation("SPEED");
+		AnimationTimer.getInstance().startAnimation("SPEED");
 	}
 	public void setFog() {
-		animationTimer.startAnimation("NEBEL");
+		fog = new Fog();
+	}
+
+	public void addObstacle(String order, String nameOfPurchaser) {
+		ObstacleController.getInstance().add(order, nameOfPurchaser);
 	}
 }
 
@@ -269,18 +200,15 @@ public class BoarderlingoTheGame extends JFrame {
 		new BoarderlingoTheGame(false);
 	}
 
-
 	public void handleTwitchMessage(String message) {
-		if(message.toUpperCase().contains("KAKTUS"))
-			gp.addPipe(message.split(" ")[0]);
-		if(message.toUpperCase().contains("HELI"))
-			gp.addHeli(message.split(" ")[0]);
+		String nameOfPurchaser = message.split(" ")[0];
+		String order = message.split(" ")[2];
+		gp.addObstacle(order, nameOfPurchaser);
+
 		if(message.toUpperCase().contains("SCHNELLER")) 
 			gp.speedUp();
 		if(message.toUpperCase().contains("NEBEL")) 
 			gp.setFog();
-		if(message.toUpperCase().contains("OMA")) 
-			gp.addGranny(message.split(" ")[0]);
 	}
 }
 

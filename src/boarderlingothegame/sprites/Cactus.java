@@ -4,11 +4,11 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 
-public class Pipe extends Obstacle{
+public class Cactus extends Obstacle{
 
 	int speed;
 	
-	public Pipe(String spawnedBy){
+	public Cactus(String spawnedBy){
 		super(spawnedBy);
 		location = new Point(2000,500);
 		speed  = 20;
