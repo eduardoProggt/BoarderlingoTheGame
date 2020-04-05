@@ -10,7 +10,7 @@ public class Heli extends Obstacle {
 	
 	public Heli(String spawnedBy){
 		super(spawnedBy);
-		location = new Point(2000,100);
+		location = new Point(2200,100);
 		speed = 10;
 	}
 	

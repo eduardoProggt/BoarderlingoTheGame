@@ -8,7 +8,7 @@ public class Granny extends Obstacle {
 
 	public Granny(String _spawnedBy) {
 		super(_spawnedBy);
-		location = new Point(location = new Point(1600,200));
+		location = new Point(location = new Point(2200,200));
 	}
 
 	@Override

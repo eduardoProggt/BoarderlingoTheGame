@@ -7,6 +7,8 @@ import javax.swing.ImageIcon;
 public class GfxLoader {
 	final static String PREFIX = "src\\boarderlingothegame\\gfx\\";
 	public static Image background = new ImageIcon("src\\boarderlingothegame\\backgrounds\\wielandstraﬂe.png").getImage(); 
+	public static Image feldBG = new ImageIcon("src\\boarderlingothegame\\backgrounds\\feldBG.png").getImage();
+	
 	public static Image idle_right1 = new ImageIcon(PREFIX+"blingo_right.png").getImage(); 
 	public static Image idle_right2 = new ImageIcon(PREFIX+"blingo_right2.png").getImage(); 
 	public static Image bremsen1 = new ImageIcon(PREFIX+"bremsen1.png").getImage(); 

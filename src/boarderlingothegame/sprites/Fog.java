@@ -33,5 +33,14 @@ public class Fog implements VisibleGrafix {
 		}
 		return null;
 	}
+	public boolean stillRunning() {
+		Integer frame = AnimationTimer.getInstance().getFrame("NEBEL");
+		if(frame == null)
+			return false;
+		return frame.intValue() > 0;
+	}
+	public void resetFogTime() {
+		AnimationTimer.getInstance().resetToFrame("NEBEL",50);
+	}
 
 }

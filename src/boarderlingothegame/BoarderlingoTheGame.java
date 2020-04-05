@@ -1,36 +1,30 @@
 
 package boarderlingothegame;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
 import java.util.Random;
-import java.util.function.Consumer;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import boarderlingothegame.controller.ButtonsEnum;
 import boarderlingothegame.controller.Controller;
 import boarderlingothegame.controller.UserInputFassade;
 import boarderlingothegame.sprites.Fog;
-import boarderlingothegame.sprites.GfxLoader;
-import boarderlingothegame.sprites.Granny;
-import boarderlingothegame.sprites.Heli;
-import boarderlingothegame.sprites.Obstacle;
-import boarderlingothegame.sprites.Cactus;
 import boarderlingothegame.sprites.Player;
 import boarderlingothegame.sprites.PlayerStateEnum;
-
-import java.awt.event.*;
-import java.awt.geom.Area;
 
 class GamePanel extends JPanel implements ActionListener {
 
 	Controller controller = new Controller();
 	UserInputFassade userInput = new UserInputFassade(controller);
-	Background background = new Background(695,535);
+	Background background = new Background();
 	Fog fog;
 	Player player;
 	private boolean offline;
@@ -72,9 +66,9 @@ class GamePanel extends JPanel implements ActionListener {
 		else if (player.getState().equals(PlayerStateEnum.BRAKING))
 			player.setState(PlayerStateEnum.IDLE);
 		if(player.isInAir())
-			calcJumpFrame();
+			player.calcJumpFrame(controller.isPressed(ButtonsEnum.SPACE));
 		else if(controller.isPressed(ButtonsEnum.SPACE)) {
-			jump();
+			player.jump();
 			controller.resetButtons();
 		}
 		else if(controller.isPressed(ButtonsEnum.DOWN)) {
@@ -100,41 +94,25 @@ class GamePanel extends JPanel implements ActionListener {
 		if(AnimationTimer.getInstance().getFrame("SPEED")<150)
 			factor = 2;
 		
-		background.getLocation().x += player.getSpeedRight()*factor; 
+		background.scroll(player.getSpeedRight()*factor);
 		ObstacleController.getInstance().autoScroll(factor,player.getSpeedRight());
 
 	}
 
-	
-	private void calcJumpFrame() {
-		int bodenhoehe = 80;
-		player.setY(player.getY()+player.getHorizontalMomentum());
-		player.decreaseHorizontalMomentum(-1.8);
-		
-		if(controller.isPressed(ButtonsEnum.SPACE) && player.getState().equals(PlayerStateEnum.JUMPING)) {
-			player.setState(PlayerStateEnum.FALLING);
-			player.setHorizontalMomentum(-16);
-		}
-		
-		if(player.getY()>bodenhoehe) {
-			player.setY(bodenhoehe);
-			player.setHorizontalMomentum(0);
-			player.setState(PlayerStateEnum.IDLE);			
-		}
-	}
-	
 	@Override
 	public void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
-
+		
+        scaleGrafics(g2d);
 		requestFocus();
 		setFocusable(true);
-
-		g2d.drawImage(background.getImage(0), 700 - background.getLocation().x, 0, null); 
-		g2d.drawImage(player.getImage(AnimationTimer.getInstance().getFrame()), (int)player.getX(), (int)player.getY(), this);
 		g2d.setFont(new Font(null, 2, 40));
+
+		g2d.drawImage(background.getRepeatImage(0),background.getRepeatLocation() , 0, null);
+		g2d.drawImage(background.getImage(0),background.getLocation().x, 0, null);
+		g2d.drawImage(player.getImage(AnimationTimer.getInstance().getFrame()), (int)player.getX(), (int)player.getY(), this);
 		ObstacleController.getInstance().draw(g2d, this);//TODO, das ist seeeeehr hässlich
 		
 		if(fog != null && fog.getLocation() != null)
@@ -146,29 +124,26 @@ class GamePanel extends JPanel implements ActionListener {
 		repaint();
 	}
 
-	void jump() 
-	{
-		if (player.getState() == PlayerStateEnum.JUMPING)
-			return;
-			player.setState(PlayerStateEnum.JUMPING);
-			player.setHorizontalMomentum(-32);
-
+	private void scaleGrafics(Graphics2D g2d) {
+		AffineTransform at = new AffineTransform();
+        at.scale(0.95, 0.95);
+        g2d.setTransform(at);
 	}
 
 
 	private void setRandomObstacles() {
 		Random wuerfel = new Random();
-		int unwahrscheinlichkeitsfaktor = 30;
+		int unwahrscheinlichkeitsfaktor = 40;
 		if(wuerfel.nextInt() %(3*unwahrscheinlichkeitsfaktor) == 0)
-			ObstacleController.getInstance().add("OMA", "AUTO");
-//		if(wuerfel.nextInt() %(5*unwahrscheinlichkeitsfaktor) == 0)
-//			addHeli("AUTO");
-//		if(wuerfel.nextInt() %(20*unwahrscheinlichkeitsfaktor) == 0)
-//			speedUp();
+			ObstacleController.getInstance().add("kaktus", "AUTO");
 		if(wuerfel.nextInt() %(5*unwahrscheinlichkeitsfaktor) == 0)
+			ObstacleController.getInstance().add("heli","AUTO");
+		if(wuerfel.nextInt() %(20*unwahrscheinlichkeitsfaktor) == 0)
+			speedUp();
+		if(wuerfel.nextInt() %(30*unwahrscheinlichkeitsfaktor) == 0)
 			setFog();
-//		if(wuerfel.nextInt() %(60*unwahrscheinlichkeitsfaktor) == 0)
-//			addGranny("AUTO");
+		if(wuerfel.nextInt() %(60*unwahrscheinlichkeitsfaktor) == 0)
+			ObstacleController.getInstance().add("oma","AUTO");
 	}
 
 
@@ -176,11 +151,18 @@ class GamePanel extends JPanel implements ActionListener {
 		AnimationTimer.getInstance().startAnimation("SPEED");
 	}
 	public void setFog() {
-		fog = new Fog();
+		if(fog != null && fog.stillRunning())
+			fog.resetFogTime();
+		else
+			fog = new Fog();
 	}
 
 	public void addObstacle(String order, String nameOfPurchaser) {
 		ObstacleController.getInstance().add(order, nameOfPurchaser);
+	}
+
+	public void transition() {
+		background.transition();
 	}
 }
 
@@ -191,24 +173,29 @@ public class BoarderlingoTheGame extends JFrame {
 	public BoarderlingoTheGame(boolean isOnTwitch) {
 		gp= new GamePanel(isOnTwitch);
 		add(gp);
-		setSize(1500, 800);
+		setSize(1600, 530);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	}
 
 	public static void main(String[] args) {
+//		AudioPlayer.playAudio("src\\boarderlingothegame\\carryon.wav");
 		new BoarderlingoTheGame(false);
 	}
 
 	public void handleTwitchMessage(String message) {
 		String nameOfPurchaser = message.split(" ")[0];
 		String order = message.split(" ")[2];
+		
 		gp.addObstacle(order, nameOfPurchaser);
 
 		if(message.toUpperCase().contains("SCHNELLER")) 
 			gp.speedUp();
 		if(message.toUpperCase().contains("NEBEL")) 
 			gp.setFog();
+		if(message.toUpperCase().contains("HINTERGRUND")) {
+			gp.transition();
+		}
 	}
 }
 

@@ -16,7 +16,7 @@ public class Player implements Collidable,VisibleGrafix {
 	private int speedRight;
 
 	public Player(){
-		setX(150);
+		setX(120);
 		setY(80);
 		setState(PlayerStateEnum.IDLE);
 		setSpeedRight(DEFAULT_SPEED);
@@ -153,5 +153,29 @@ public class Player implements Collidable,VisibleGrafix {
 	public void applyHorizontalMomentum(double i) {
 		horizontalMomentum += i;
 		
+	}
+
+	public void jump() 
+	{
+		if (getState() == PlayerStateEnum.JUMPING)
+			return;
+			setState(PlayerStateEnum.JUMPING);
+			setHorizontalMomentum(-32);
+	}
+	public void calcJumpFrame(boolean spacePressed) {
+		int bodenhoehe = 80;
+		setY(getY()+getHorizontalMomentum());
+		decreaseHorizontalMomentum(-1.8);
+		
+		if(spacePressed && getState().equals(PlayerStateEnum.JUMPING)) {
+			setState(PlayerStateEnum.FALLING);
+			setHorizontalMomentum(-16);
+		}
+		
+		if(getY()>bodenhoehe) {
+			setY(bodenhoehe);
+			setHorizontalMomentum(0);
+			setState(PlayerStateEnum.IDLE);			
+		}
 	}
 }

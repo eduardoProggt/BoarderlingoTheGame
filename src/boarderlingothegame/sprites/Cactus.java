@@ -10,7 +10,7 @@ public class Cactus extends Obstacle{
 	
 	public Cactus(String spawnedBy){
 		super(spawnedBy);
-		location = new Point(2000,500);
+		location = new Point(2200,500);
 		speed  = 20;
 	}
 	
