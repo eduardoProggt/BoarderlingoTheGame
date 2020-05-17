@@ -1,6 +1,6 @@
 package boarderlingothegame;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.Point;
 
 import boarderlingothegame.sprites.GfxLoader;
@@ -22,7 +22,7 @@ public class Background implements VisibleGrafix {
 	}
 
 	@Override
-	public Image getImage(int counterVariable) {
+	public BufferedImage getImage(int counterVariable) {
 		if(backgroundState.equals(STADT))
 		    return GfxLoader.background;
 		else {
@@ -83,14 +83,14 @@ public class Background implements VisibleGrafix {
 			return getBGImageLaenge() + getLocation().x;
 	}
 
-	public Image getRepeatImage(int i) {
+	public BufferedImage getRepeatImage(int i) {
 		if(!state.equals(BGState.INTRANSITION))
 			return getImage(i);
 		else
 			return hässlicheMockFunktionDieNochAusgewechseltWird();
 	}
 
-	private Image hässlicheMockFunktionDieNochAusgewechseltWird() {
+	private BufferedImage hässlicheMockFunktionDieNochAusgewechseltWird() {
 		if(backgroundState.equals(STADT))
 		    return GfxLoader.feldBG;
 		else {

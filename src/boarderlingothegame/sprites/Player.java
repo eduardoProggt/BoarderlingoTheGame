@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 
 public class Player implements Collidable,VisibleGrafix {
 	private final int DEFAULT_SPEED = 16; 
@@ -16,7 +17,7 @@ public class Player implements Collidable,VisibleGrafix {
 	private int speedRight;
 
 	public Player(){
-		setX(120);
+		setX(80);
 		setY(80);
 		setState(PlayerStateEnum.IDLE);
 		setSpeedRight(DEFAULT_SPEED);
@@ -85,7 +86,7 @@ public class Player implements Collidable,VisibleGrafix {
 		return new Point((int)getX(),(int)getY());
 	} 
 	@Override
-	public Image getImage(int counterVariable) {
+	public BufferedImage getImage(int counterVariable) {
 		if(getState().equals(PlayerStateEnum.IDLE)) {
 		if (counterVariable % 3 == 0 | counterVariable % 5 == 0)
 			return GfxLoader.idle_right1;
@@ -177,5 +178,11 @@ public class Player implements Collidable,VisibleGrafix {
 			setHorizontalMomentum(0);
 			setState(PlayerStateEnum.IDLE);			
 		}
+	}
+
+	@Override
+	public String getNameAsString() {
+		// TODO Noch braucht der Player keinen namen. Hier sehen Sie eine Verletzung des YAGNI
+		return "Robin Nosterafuuh";
 	}
 }

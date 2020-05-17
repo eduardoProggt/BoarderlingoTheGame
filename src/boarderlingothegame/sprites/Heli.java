@@ -1,6 +1,6 @@
 package boarderlingothegame.sprites;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.Point;
 import java.awt.Polygon;
 
@@ -35,7 +35,7 @@ public class Heli extends Obstacle {
 	}
 
 	@Override
-	public Image getImage(int unused) {
+	public BufferedImage getImage(int unused) {
 		return GfxLoader.heli;
 	}
 
@@ -43,6 +43,12 @@ public class Heli extends Obstacle {
 	public void moveRight(int speed) {
 		getLocation().x = getLocation().x -speed;
 		
+	}
+
+	@Override
+	public String getNameAsString() {
+
+		return "Heli";
 	}
 
 

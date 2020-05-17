@@ -3,6 +3,7 @@ package boarderlingothegame.sprites;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.image.BufferedImage;
 
 public class Cactus extends Obstacle{
 
@@ -10,7 +11,7 @@ public class Cactus extends Obstacle{
 	
 	public Cactus(String spawnedBy){
 		super(spawnedBy);
-		location = new Point(2200,500);
+		location =new Point(2200,500);
 		speed  = 20;
 	}
 	
@@ -33,13 +34,20 @@ public class Cactus extends Obstacle{
 	}
 
 	@Override
-	public Image getImage(int unused) {
+	public BufferedImage getImage(int unused) {
 		return GfxLoader.pipe;
 	}
 
 	@Override
 	public void moveRight(int speed) {
 		getLocation().x = getLocation().x -speed;
+	}
+
+
+
+	@Override
+	public String getNameAsString() {
+		return "Stachelkaktus";
 	}
 
 }

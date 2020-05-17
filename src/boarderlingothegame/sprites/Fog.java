@@ -1,6 +1,6 @@
 package boarderlingothegame.sprites;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.Point;
 
 import boarderlingothegame.AnimationTimer;
@@ -13,7 +13,7 @@ public class Fog implements VisibleGrafix {
 	}
 	
 	@Override
-	public Image getImage(int counterVariable) {
+	public BufferedImage getImage(int counterVariable) {
 		return GfxLoader.nebel;
 	}
 

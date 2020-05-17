@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.swing.JOptionPane;
 
@@ -20,7 +21,6 @@ public class ObstacleController {
 	
 	private List<Obstacle> obstacles;
 	private static ObstacleController singleton;
-	public boolean isCollided = false;
 	
 	private ObstacleController() {};
 	
@@ -33,23 +33,33 @@ public class ObstacleController {
 	public void reset() {
 		obstacles  = new ArrayList<>();
 	}
-	public void collide(Polygon hitBox) {
-		doForAllObstacles(e->collisionDetection(e,hitBox));
+	public synchronized Obstacle collide(Polygon hitBox) {
+		return getObstacles()
+				.stream()
+				.filter(e->collisionDetection(e,hitBox))
+			    .findFirst().orElse(null);
 	}
-	private void collisionDetection(Obstacle eObst, Polygon hitbox) {
+	private boolean collisionDetection(Obstacle eObst, Polygon hitbox) {
 		if( eObst.getHitBox().intersects(hitbox.getBounds()) ){
 		    Area collision = new Area(eObst.getHitBox());
 		    collision.intersect(new Area(hitbox));
-		    if(!collision.isEmpty()){
-				JOptionPane.showMessageDialog(null,"AUA (Gelähmt gar quer)");
-				System.out.println(eObst.getSpawnedBy());
-				reset();
-				isCollided = true;
-				return;
-		    }
+		    boolean collisionHappened = !collision.isEmpty();
+			return collisionHappened;
+		   
 		}
+		return false;
 	}
-	
+	private synchronized Boolean detectCollision(Function<Obstacle,Boolean> function) {
+		for (Iterator<Obstacle> iterator = getObstacles().iterator(); iterator.hasNext();) {
+			try {
+			    Obstacle eObst = iterator.next();
+			    return function.apply(eObst);
+			} catch (Exception exc) {
+				System.out.println("\u001B[31m" + exc.getMessage() + "\u001B[0m");
+			}
+		}
+		return Boolean.FALSE;
+	}
 	private synchronized void doForAllObstacles(Consumer<Obstacle> function) {
 		for (Iterator<Obstacle> iterator = getObstacles().iterator(); iterator.hasNext();) {
 			try {
@@ -76,6 +86,10 @@ public class ObstacleController {
 		        iterator.remove();
 		    }
 		}
+	}
+	public synchronized void removeObject(Obstacle obstacleToRemove) {
+
+		getObstacles().remove(obstacleToRemove);
 	}
 	private List<Obstacle> getObstacles() {
 		return obstacles;

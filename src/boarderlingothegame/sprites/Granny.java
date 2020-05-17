@@ -1,6 +1,6 @@
 package boarderlingothegame.sprites;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.Point;
 import java.awt.Polygon;
 
@@ -31,7 +31,7 @@ public class Granny extends Obstacle {
 	}
 
 	@Override
-	public Image getImage(int frame) {
+	public BufferedImage getImage(int frame) {
 		if(frame%8<4 && getLocation().x<1000)
 			return GfxLoader.oma1;
 		else
@@ -48,6 +48,12 @@ public class Granny extends Obstacle {
 		if(getLocation().x<1000)
 		location.y =location.y+3; 
 		
+	}
+
+	@Override
+	public String getNameAsString() {
+		// TODO Auto-generated method stub
+		return "Oma";
 	}
 
 }

@@ -10,4 +10,5 @@ public interface Collidable {
 	 * @return Polygon
 	 */
 	Polygon getHitBox();
+	String getNameAsString();
 }
