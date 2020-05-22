@@ -208,7 +208,7 @@ public class BoarderlingoTheGame extends JFrame {
 	GamePanel gp = null;
 
 	public BoarderlingoTheGame(boolean isOnTwitch) {
-		if(true) {
+		if(false) {
 		gp= new GamePanel(isOnTwitch);
 		add(gp);
 		setSize(1600, 600);

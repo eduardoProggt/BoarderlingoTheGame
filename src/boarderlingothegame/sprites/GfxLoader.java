@@ -7,7 +7,15 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import glgfxinterface.Tile;
+
 public class GfxLoader {
+
+
+	
+	
+	
+	
 	final static String PREFIX = "src\\boarderlingothegame\\gfx\\";
 	public static BufferedImage background = getImage("src\\boarderlingothegame\\backgrounds\\wielandstraﬂe.png"); 
 	public static BufferedImage feldBG = getImage("src\\boarderlingothegame\\backgrounds\\feldBG.png");
@@ -30,6 +38,7 @@ public class GfxLoader {
 	private static BufferedImage getImage(String string) {
 
 		try {
+//			feldBG.get
 			return ImageIO.read(new File(string));
 		} catch (IOException e) {
 			e.printStackTrace();

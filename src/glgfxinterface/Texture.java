@@ -6,6 +6,8 @@ import static org.lwjgl.opengl.GL13.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
@@ -17,13 +19,22 @@ public class Texture {
 	private int width;
 	private int height;
 	
-	public Texture(BufferedImage image) {
+	public Texture(String fileString) {
+		BufferedImage bufferedImage = null;
 
-			width = image.getWidth();
-			height = image.getHeight();
+			try {
+			File input = new File(fileString);
+			bufferedImage = ImageIO.read(input);
+	
+			width = bufferedImage.getWidth();
+			height = bufferedImage.getHeight();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			int[] pixels_raw = new int[width*height];
-			pixels_raw = image.getRGB(0, 0, width, height, null, 0, width);
+			pixels_raw = bufferedImage.getRGB(0, 0, width, height, null, 0, width);
 			ByteBuffer pixels = BufferUtils.createByteBuffer(width*height*4);
 		
 			for (int y=0; y<height; y++){

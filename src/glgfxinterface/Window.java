@@ -20,17 +20,18 @@ public class Window {
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE); 
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); 
 		
-		window = glfwCreateWindow(width, height, title, 0, 0);
+		window = glfwCreateWindow(getWidth(), getHeight(), title, 0, 0);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 	
-		glfwShowWindow(window);
+		
 		glfwMakeContextCurrent(window);
 		
 		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
 			if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
 				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
 		});
+		glfwShowWindow(window);
 	}
 	public boolean shouldClose() {
 		return glfwWindowShouldClose(window);
@@ -63,5 +64,13 @@ public class Window {
 			}
 		});
 		
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getWidth() {
+		return width;
 	}
 }

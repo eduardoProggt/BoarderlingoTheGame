@@ -17,6 +17,9 @@ public class Shader {
 	int program;
 	int fragmentShader;
 	int vertexShader;
+	static Shader shader;
+	
+
 	
 	public Shader(String filename) {
 		super();
