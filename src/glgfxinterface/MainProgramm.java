@@ -19,15 +19,24 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glEnable;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
 import boarderlingothegame.controller.GameController;
+import boarderlingothegame.sprites.Cactus;
+import boarderlingothegame.sprites.Granny;
+import boarderlingothegame.sprites.Heli;
+import boarderlingothegame.sprites.Obstacle;
+import boarderlingothegame.web.WebSocketServer;
+
 
 public class MainProgramm implements GfxFassade{
 	
-	// The window handle
+	private Queue<Obstacle> twitchOrders = new LinkedList<>();
 	private Window win;
 	float offset = 0f;
 	int framesTillStart = 0;
@@ -87,7 +96,8 @@ public class MainProgramm implements GfxFassade{
 			}
 			
 			glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT);
-			
+			if(!twitchOrders.isEmpty())
+				gameController.addObstacle(twitchOrders.poll());
 			gameController.calcNextFrame();
 			win.swapBuffers();
 			 
@@ -103,6 +113,29 @@ public class MainProgramm implements GfxFassade{
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 		glEnable(GL_TEXTURE_2D);
+	}
+
+	@Override
+	public void handleNewTwitchOrder(String order, String nameOfPurchaser) {
+		if(order.toUpperCase().contains("KAKTUS"))
+			twitchOrders.offer(new Cactus(nameOfPurchaser));
+		
+		if(order.toUpperCase().contains("HELI"))
+			twitchOrders.offer(new Heli(nameOfPurchaser));
+		
+		if(order.toUpperCase().contains("OMA"))
+			twitchOrders.offer(new Granny(nameOfPurchaser));
+	
+		if(order.toUpperCase().contains("SCHNELLER")) 
+//			twitchOrders.offer("SCHNELLER");
+			
+		if(order.toUpperCase().contains("NEBEL")) 
+//			twitchOrders.offer("NEBEL");
+			
+		if(order.toUpperCase().contains("HINTERGRUND")) {
+//			twitchOrders.offer("HINTERGRUND");
+		}
+		
 	}
 
 }

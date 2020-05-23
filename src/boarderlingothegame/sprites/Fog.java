@@ -20,14 +20,16 @@ public class Fog implements VisibleGrafix {
 		AnimationTimer animationTimer = AnimationTimer.getInstance();
 		if(animationTimer.getFrame("NEBEL") != null) {
 			int nebelTime = animationTimer.getFrame("NEBEL").intValue();
-			if(nebelTime > 550)
+			
+			if(nebelTime > 550 && nebelTime<=610)
 				return new Point( 500+(nebelTime-550)*25,0);
-			else if(nebelTime<=550 && nebelTime >= 50) {
+			
+			if(nebelTime<=550 && nebelTime >= 50) 
 				return new Point( 500,0);
-			}
-			else if(nebelTime >= 0){
+			
+			if(nebelTime >= 0)
 				return new Point( 500+(50-nebelTime)*25,0);
-			}
+			
 		}
 		return null;
 	}

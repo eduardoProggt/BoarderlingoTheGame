@@ -10,4 +10,5 @@ public interface GfxFassade {
 	static GfxFassade createInstance() {
 		return new MainProgramm();
 	}
+	void handleNewTwitchOrder(String order, String nameOfPurchaser);
 }
