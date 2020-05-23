@@ -5,9 +5,12 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 
+import glgfxinterface.Tile;
+
 public class Bullet implements Collidable, VisibleGrafix {
 
 	Point location;
+	Tile image = new Tile("src\\boarderlingothegame\\gfx\\Bullet.png", 20, 10);
 	
 	public Bullet() {
 		location = new Point(400,500);
@@ -24,11 +27,6 @@ public class Bullet implements Collidable, VisibleGrafix {
 	}
 
 	@Override
-	public BufferedImage getImage(int counterVariable) {
-		return GfxLoader.bullet;
-	}
-
-	@Override
 	public Point getLocation() {
 		return location;
 	}
@@ -39,6 +37,11 @@ public class Bullet implements Collidable, VisibleGrafix {
 	@Override
 	public String getNameAsString() {
 		return "Geschoss";
+	}
+
+	@Override
+	public Tile getTile(int counterVariable) {
+		return image;
 	}
 
 }

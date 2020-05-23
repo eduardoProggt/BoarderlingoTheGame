@@ -8,37 +8,43 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWErrorCallbackI;
 
 public class Window {
-	private long window;
+	private long windowID;
 	private int height, width;
-	public Window(int width, int height) {
-		setSize(width,height);
-	}
+	private static Window window;
 	
-	public void createWindow(String title) {
-		
+	private Window() {
+
+	}
+	public static Window getInstance() {
+		if(window ==null)
+			window = new Window();
+		return window;
+	}
+	public void createWindow(String title,int width,int height) {
+		setSize(width,height);
 		glfwDefaultWindowHints(); 
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE); 
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); 
 		
-		window = glfwCreateWindow(getWidth(), getHeight(), title, 0, 0);
-		if ( window == NULL )
+		windowID = glfwCreateWindow(getWidth(), getHeight(), title, 0, 0);
+		if ( windowID == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 	
 		
-		glfwMakeContextCurrent(window);
+		glfwMakeContextCurrent(windowID);
 		
-		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+		glfwSetKeyCallback(windowID, (window, key, scancode, action, mods) -> {
 			if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
 				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
 		});
-		glfwShowWindow(window);
+		glfwShowWindow(windowID);
 	}
 	public boolean shouldClose() {
-		return glfwWindowShouldClose(window);
+		return glfwWindowShouldClose(windowID);
 	}
 	
 	public long getWinId() {
-		return window;
+		return windowID;
 	}
 	private void setSize(int _width, int _height) {
 		width = _width;
@@ -46,13 +52,13 @@ public class Window {
 	}
 
 	public void destroy() {
-		glfwFreeCallbacks(window);
-		glfwDestroyWindow(window);
+		glfwFreeCallbacks(windowID);
+		glfwDestroyWindow(windowID);
 		
 	}
 
 	public void swapBuffers() {
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(windowID);
 		
 	}
 	public static void setCallbacks() {

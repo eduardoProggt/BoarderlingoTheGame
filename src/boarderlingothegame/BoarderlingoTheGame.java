@@ -16,22 +16,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import boarderlingothegame.controller.ButtonsEnum;
-import boarderlingothegame.controller.Controller;
-import boarderlingothegame.controller.UserInputFassade;
+import boarderlingothegame.controller.InputController;
 import boarderlingothegame.sprites.Bullet;
 import boarderlingothegame.sprites.Fog;
-import boarderlingothegame.sprites.GfxLoader;
 import boarderlingothegame.sprites.Obstacle;
 import boarderlingothegame.sprites.Player;
-import boarderlingothegame.sprites.PlayerStateEnum;
-import boarderlingothegame.sprites.VisibleGrafix;
 import glgfxinterface.GfxFassade;
 
 class GamePanel extends JPanel implements ActionListener {
 
-	Controller controller = new Controller();
-	UserInputFassade userInput = new UserInputFassade(controller);
+	InputController controller = new InputController();
 	Background background = new Background();
 	Fog fog;
 	Bullet bullet;
@@ -48,7 +42,7 @@ class GamePanel extends JPanel implements ActionListener {
 		time.start();		    	// actionlistener for the animation
 		offline = !isOnTwitch;
 	
-		addKeyListener(userInput.getKeyListener());
+
 		AnimationTimer.getInstance().startAnimation("SCORE");
 		reset();
 	}
@@ -60,7 +54,6 @@ class GamePanel extends JPanel implements ActionListener {
 		animationTimer.startAnimation("SCORE");
 		ObstacleController.getInstance().reset();
 		player = new Player();
-		controller.resetButtons();
 		bullets = 3;
 	}
 	
@@ -68,35 +61,36 @@ class GamePanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		autoScroll();
 		
-		if(controller.isPressed(ButtonsEnum.SPECIAL)) {
-			highscore = 0;
-		}
-		
-		if (controller.isPressed(ButtonsEnum.LEFT) && !player.isInAir())
-			player.setState(PlayerStateEnum.BRAKING);
-		else if (player.getState().equals(PlayerStateEnum.BRAKING))
-			player.setState(PlayerStateEnum.IDLE);
-		if(player.isInAir())
-			player.calcJumpFrame(controller.isPressed(ButtonsEnum.SPACE));
-		else if(controller.isPressed(ButtonsEnum.SPACE) && !player.getState().equals(PlayerStateEnum.DUCKING)) {
-			player.jump();
-			controller.resetButtons();
-		}
-
-		else if(controller.isPressed(ButtonsEnum.DOWN)) {
-			player.setState(PlayerStateEnum.DUCKING);
-		}
-		else if(player.getState().equals(PlayerStateEnum.DUCKING)){
-			player.setState(PlayerStateEnum.IDLE);
-		}
-		if(controller.isPressed(ButtonsEnum.SPACE) && player.getState().equals(PlayerStateEnum.DUCKING)) {
-			System.out.println("noch "+ bullets+" Kugeln übrig");
-			if(bullets>0 && (bullet == null || bullet.getLocation().x > 1000))//Noch Kugeln und noch keine da oder die letzte weit genug weg
-			{
-				bullet=new Bullet();
-				bullets--;
-			}
-		}	
+//		if(controller.isPressed(ButtonsEnum.SPECIAL)) {
+//			highscore = 0;
+//		}
+//		
+//		if (controller.isPressed(ButtonsEnum.LEFT) && !player.isInAir())
+//			player.setState(PlayerStateEnum.BRAKING);
+//		else if (player.getState().equals(PlayerStateEnum.BRAKING))
+//			player.setState(PlayerStateEnum.IDLE);
+//		if(player.isInAir())
+//		
+//			player.calcJumpFrame();
+//		else if(controller.isPressed(ButtonsEnum.SPACE) && !player.getState().equals(PlayerStateEnum.DUCKING)) {
+//			player.jump();
+//			controller.resetButtons();
+//		}
+//
+//		else if(controller.isPressed(ButtonsEnum.DOWN)) {
+//			player.setState(PlayerStateEnum.DUCKING);
+//		}
+//		else if(player.getState().equals(PlayerStateEnum.DUCKING)){
+//			player.setState(PlayerStateEnum.IDLE);
+//		}
+//		if(controller.isPressed(ButtonsEnum.SPACE) && player.getState().equals(PlayerStateEnum.DUCKING)) {
+//			System.out.println("noch "+ bullets+" Kugeln übrig");
+//			if(bullets>0 && (bullet == null || bullet.getLocation().x > 1000))//Noch Kugeln und noch keine da oder die letzte weit genug weg
+//			{
+//				bullet=new Bullet();
+//				bullets--;
+//			}
+//		}	
 		ObstacleController obstCtlr = ObstacleController.getInstance();
 		Obstacle collided = obstCtlr.collide(player.getHitBox());
 		if(obstCtlr.collide(player.getHitBox()) != null) {
@@ -140,23 +134,23 @@ class GamePanel extends JPanel implements ActionListener {
 		setFocusable(true);
 		g2d.setFont(new Font(null, 2, 40));
 
-		g2d.drawImage(background.getRepeatImage(0),background.getRepeatLocation() , 0, null);
-		g2d.drawImage(background.getImage(0),background.getLocation().x, 0, null);
-		g2d.drawImage(player.getImage(AnimationTimer.getInstance().getFrame()), (int)player.getX(), (int)player.getY(), this);
-		if(bullet != null)
-			g2d.drawImage(bullet.getImage(0),bullet.getLocation().x,bullet.getLocation().y,this);
-		
-		ObstacleController.getInstance().draw(g2d, this);//TODO, das ist seeeeehr hässlich
-		
-		if(fog != null && fog.getLocation() != null)
-			g2d.drawImage(fog.getImage(0), fog.getLocation().x,0, this);
-		
-		g2d.drawString("Score: \n "+AnimationTimer.getInstance().getFrame("SCORE"), 0, 40);
-		g2d.drawString("Highscore: \n "+highscore, 0, 80);
-
-		for (int i = 0; i < bullets; i++) {
-			g2d.drawImage(GfxLoader.bullet, 50, 100+ i*30, this);
-		}
+//		g2d.drawImage(background.getRepeatImage(0),background.getRepeatLocation() , 0, null);
+//		g2d.drawImage(background.getImage(0),background.getLocation().x, 0, null);
+//		g2d.drawImage(player.getImage(AnimationTimer.getInstance().getFrame()), (int)player.getX(), (int)player.getY(), this);
+//		if(bullet != null)
+//			g2d.drawImage(bullet.getImage(0),bullet.getLocation().x,bullet.getLocation().y,this);
+//		
+//		ObstacleController.getInstance().draw(g2d, this);//TODO, das ist seeeeehr hässlich
+//		
+//		if(fog != null && fog.getLocation() != null)
+//			g2d.drawImage(fog.getImage(0), fog.getLocation().x,0, this);
+//		
+//		g2d.drawString("Score: \n "+AnimationTimer.getInstance().getFrame("SCORE"), 0, 40);
+//		g2d.drawString("Highscore: \n "+highscore, 0, 80);
+//
+//		for (int i = 0; i < bullets; i++) {
+//			g2d.drawImage(GfxLoader.bullet, 50, 100+ i*30, this);
+//		}
 		
 		repaint();
 	}
@@ -198,9 +192,6 @@ class GamePanel extends JPanel implements ActionListener {
 		ObstacleController.getInstance().add(order, nameOfPurchaser);
 	}
 
-	public void transition() {
-		background.transition();
-	}
 }
 
 public class BoarderlingoTheGame extends JFrame {
@@ -209,18 +200,16 @@ public class BoarderlingoTheGame extends JFrame {
 
 	public BoarderlingoTheGame(boolean isOnTwitch) {
 		if(false) {
-		gp= new GamePanel(isOnTwitch);
-		add(gp);
-		setSize(1600, 600);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setVisible(true);}
+			gp= new GamePanel(isOnTwitch);
+			add(gp);
+			setSize(1600, 600);
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			setVisible(true);
+		}
 		else {	
-		List<VisibleGrafix> mockliste = new ArrayList<>();
-		Player fakePlayer = new Player();
-		mockliste.add(fakePlayer);
-		GfxFassade gfx = GfxFassade.createInstance();
-		gfx.run(1900, 650, "BoarderlingoTheGame");
-		gfx.update(mockliste);}
+			GfxFassade gfx = GfxFassade.createInstance();
+			gfx.run(1900, 650, "BoarderlingoTheGame");
+		}
 	}
 
 	public static void main(String[] args) {
@@ -239,7 +228,7 @@ public class BoarderlingoTheGame extends JFrame {
 		if(message.toUpperCase().contains("NEBEL")) 
 			gp.setFog();
 		if(message.toUpperCase().contains("HINTERGRUND")) {
-			gp.transition();
+			//TODO
 		}
 	}
 }

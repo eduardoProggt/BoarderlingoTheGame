@@ -1,17 +1,19 @@
 package boarderlingothegame.sprites;
 
-import java.awt.image.BufferedImage;
+import glgfxinterface.Tile;
+
 import java.awt.Point;
 import java.awt.Polygon;
 
 public class Heli extends Obstacle {
 
-	int speed;
+	float speedOffset;
+	private static Tile image = new Tile("src\\boarderlingothegame\\gfx\\Heli.png", 150, 100);
 	
 	public Heli(String spawnedBy){
 		super(spawnedBy);
-		location = new Point(2200,100);
-		speed = 10;
+		location = new Point(2200,50);
+		speedOffset = 3.5f;
 	}
 	
 	private Point location;
@@ -34,14 +36,11 @@ public class Heli extends Obstacle {
 		return retPol;
 	}
 
-	@Override
-	public BufferedImage getImage(int unused) {
-		return GfxLoader.heli;
-	}
 
 	@Override
 	public void moveRight(int speed) {
-		getLocation().x = getLocation().x -speed;
+		int absoluteSpeed = (int)((float)speed + speedOffset);
+		getLocation().x = getLocation().x -absoluteSpeed;
 		
 	}
 
@@ -49,6 +48,11 @@ public class Heli extends Obstacle {
 	public String getNameAsString() {
 
 		return "Heli";
+	}
+
+	@Override
+	public Tile getTile(int counterVariable) {
+		return image;
 	}
 
 

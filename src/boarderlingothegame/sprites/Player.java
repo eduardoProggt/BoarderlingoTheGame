@@ -7,20 +7,29 @@ import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
+import glgfxinterface.Tile;
+
 public class Player implements Collidable,VisibleGrafix {
-	private final int DEFAULT_SPEED = 16; 
-	
+
 	private double x,y, horizontalMomentum;
 	
-	
 	private PlayerStateEnum state;
+	
 	private int speedRight;
+	private final int SPRUNGKRAFT = 20;
 
+	private Tile idleRight1 = new Tile("src\\boarderlingothegame\\gfx\\blingo_right.png",350,600); 
+	private Tile idleRight2= new Tile("src\\boarderlingothegame\\gfx\\blingo_right2.png",350,600); 
+	private Tile brake1= new Tile("src\\boarderlingothegame\\gfx\\bremsen1.png",350,600); 
+	private Tile brake2= new Tile("src\\boarderlingothegame\\gfx\\bremsen2.png",350,600); 
+	private Tile ducking = new Tile("src\\boarderlingothegame\\gfx\\blingo_ducking.png",350,600);
+	private Tile jumping = new Tile("src\\boarderlingothegame\\gfx\\blingo_jump.png",350,600);
+	
 	public Player(){
-		setX(80);
-		setY(80);
+		setX(10);
+		setY(20);
 		setState(PlayerStateEnum.IDLE);
-		setSpeedRight(DEFAULT_SPEED);
+		setSpeedRight(8);
 	}
 
 	public boolean isInAir() {
@@ -85,26 +94,26 @@ public class Player implements Collidable,VisibleGrafix {
 	public Point getLocation() {
 		return new Point((int)getX(),(int)getY());
 	} 
-	@Override
-	public BufferedImage getImage(int counterVariable) {
+
+	public Tile getTile(int counterVariable) {
 		if(getState().equals(PlayerStateEnum.IDLE)) {
 		if (counterVariable % 3 == 0 | counterVariable % 5 == 0)
-			return GfxLoader.idle_right1;
+			return idleRight1;
 		else
-			return GfxLoader.idle_right2;
+			return idleRight2;
 		}
 		if(isInAir())
-			return GfxLoader.jump;
+			return jumping;
 		if(getState().equals(PlayerStateEnum.DUCKING))
-			return GfxLoader.player_ducking;	
+			return ducking;	
 		if(getState().equals(PlayerStateEnum.BRAKING)) {
 			if (counterVariable % 3 == 0 | counterVariable % 5 == 0)
-				return GfxLoader.bremsen1; // set image
+				return brake1; // set image
 			else
-				return GfxLoader.bremsen2;
+				return brake2;
 		}
 		
-		return  GfxLoader.idle_right1; //Default
+		return idleRight1; //Default
 	}
 	
 	public double getX() {
@@ -119,14 +128,14 @@ public class Player implements Collidable,VisibleGrafix {
 		return y;
 	}
 
-	public void setY(double d) {
-		this.y = d;
+	public void setY(double y) {
+		this.y =y;
 	}
 	public PlayerStateEnum getState() {
 		return state;
 	}
 
-	public void setState(PlayerStateEnum state) {
+	private void setState(PlayerStateEnum state) {
 		this.state = state;
 	}
 
@@ -147,31 +156,30 @@ public class Player implements Collidable,VisibleGrafix {
 	public void setHorizontalMomentum(int horizontalMomentum) {
 		this.horizontalMomentum = horizontalMomentum;
 	}
-	public void decreaseHorizontalMomentum(double d) {
-		horizontalMomentum -= d;
+	public void decreaseHorizontalMomentum(double diff) {
+		horizontalMomentum -= diff;
 	}
 
-	public void applyHorizontalMomentum(double i) {
-		horizontalMomentum += i;
+	public void applyHorizontalMomentum(double momentum) {
+		horizontalMomentum += momentum;
 		
 	}
 
-	public void jump() 
-	{
-		if (getState() == PlayerStateEnum.JUMPING)
-			return;
-			setState(PlayerStateEnum.JUMPING);
-			setHorizontalMomentum(-32);
-	}
-	public void calcJumpFrame(boolean spacePressed) {
-		int bodenhoehe = 80;
-		setY(getY()+getHorizontalMomentum());
-		decreaseHorizontalMomentum(-1.8);
+	public void jump() {
+		if (getState() == PlayerStateEnum.JUMPING) {
 		
-		if(spacePressed && getState().equals(PlayerStateEnum.JUMPING)) {
 			setState(PlayerStateEnum.FALLING);
-			setHorizontalMomentum(-16);
+			setHorizontalMomentum(-SPRUNGKRAFT/2);
 		}
+		if(getState() == PlayerStateEnum.IDLE) {
+			setState(PlayerStateEnum.JUMPING);
+			setHorizontalMomentum(-SPRUNGKRAFT);
+		}
+	}
+	public void calcJumpFrame() {
+		int bodenhoehe = 0;
+		setY(getY()+getHorizontalMomentum());
+		decreaseHorizontalMomentum(-0.55);
 		
 		if(getY()>bodenhoehe) {
 			setY(bodenhoehe);
@@ -184,5 +192,26 @@ public class Player implements Collidable,VisibleGrafix {
 	public String getNameAsString() {
 		// TODO Noch braucht der Player keinen namen. Hier sehen Sie eine Verletzung des YAGNI
 		return "Robin Nosterafuuh";
+	}
+
+	public void duck() {
+		if(!isInAir())
+			setState(PlayerStateEnum.DUCKING);
+	}
+
+	public void brake() {
+		if(!isInAir())
+			setState(PlayerStateEnum.BRAKING);
+	}
+
+	public void resetState() {
+		if(!isInAir())
+			setState(PlayerStateEnum.IDLE);
+		
+	}
+
+	public void shoot() {
+		// TODO
+		System.out.println("Shoot");
 	}
 }

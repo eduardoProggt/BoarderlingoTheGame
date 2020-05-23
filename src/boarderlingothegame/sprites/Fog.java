@@ -4,18 +4,16 @@ import java.awt.image.BufferedImage;
 import java.awt.Point;
 
 import boarderlingothegame.AnimationTimer;
+import glgfxinterface.Tile;
 
 public class Fog implements VisibleGrafix {
 
+	Tile image = new Tile("src\\boarderlingothegame\\gfx\\Nebel.png",1620,751);
 	
 	public Fog() {
 		AnimationTimer.getInstance().startAnimation("NEBEL");
 	}
 	
-	@Override
-	public BufferedImage getImage(int counterVariable) {
-		return GfxLoader.nebel;
-	}
 
 	@Override
 	public Point getLocation() {
@@ -41,6 +39,12 @@ public class Fog implements VisibleGrafix {
 	}
 	public void resetFogTime() {
 		AnimationTimer.getInstance().resetToFrame("NEBEL",50);
+	}
+
+
+	@Override
+	public Tile getTile(int counterVariable) {
+		return image;
 	}
 
 }

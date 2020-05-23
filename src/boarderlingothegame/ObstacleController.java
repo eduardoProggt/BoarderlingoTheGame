@@ -120,7 +120,7 @@ public class ObstacleController {
 	}
 
 	private void drawObstacle(Obstacle eObst, Graphics2D g2d, GamePanel gamePanel) {
-		g2d.drawImage(eObst.getImage(AnimationTimer.getInstance().getFrame()),eObst.getLocation().x,eObst.getLocation().y,gamePanel);
+//		g2d.drawImage(eObst.getImage(AnimationTimer.getInstance().getFrame()),eObst.getLocation().x,eObst.getLocation().y,gamePanel);
 		g2d.drawString(eObst.getSpawnedBy(), eObst.getLocation().x,eObst.getLocation().y);
 	}
 }

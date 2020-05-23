@@ -5,17 +5,16 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 
+import glgfxinterface.Tile;
+
 public class Cactus extends Obstacle{
 
-	int speed;
+	private static Tile image = new Tile("src\\boarderlingothegame\\gfx\\cactus.png",130,182);
 	
 	public Cactus(String spawnedBy){
 		super(spawnedBy);
-		location =new Point(2200,500);
-		speed  = 20;
+		location =new Point(2200,440); 
 	}
-	
-	
 	
 	@Override
 	public Point getLocation() {
@@ -34,20 +33,20 @@ public class Cactus extends Obstacle{
 	}
 
 	@Override
-	public BufferedImage getImage(int unused) {
-		return GfxLoader.pipe;
-	}
-
-	@Override
 	public void moveRight(int speed) {
 		getLocation().x = getLocation().x -speed;
 	}
-
 
 
 	@Override
 	public String getNameAsString() {
 		return "Stachelkaktus";
 	}
+
+	@Override
+	public Tile getTile(int counterVariable) {
+		return image;
+	}
+
 
 }

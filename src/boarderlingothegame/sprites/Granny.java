@@ -1,14 +1,21 @@
 package boarderlingothegame.sprites;
 
 import java.awt.image.BufferedImage;
+
+import glgfxinterface.Tile;
+
 import java.awt.Point;
 import java.awt.Polygon;
 
 public class Granny extends Obstacle {
 
+	private static Tile oma1 = new Tile("src\\boarderlingothegame\\gfx\\Oma1.png",280,515); 
+	private static Tile oma2 = new Tile("src\\boarderlingothegame\\gfx\\Oma2.png",280,515); 
+	private boolean isMovingDown= false;
+	
 	public Granny(String _spawnedBy) {
 		super(_spawnedBy);
-		location = new Point(location = new Point(2200,200));
+		location = new Point(location = new Point(2200,50));
 	}
 
 	@Override
@@ -30,30 +37,29 @@ public class Granny extends Obstacle {
 		return retPol;
 	}
 
-	@Override
-	public BufferedImage getImage(int frame) {
-		if(frame%8<4 && getLocation().x<1000)
-			return GfxLoader.oma1;
-		else
-			return GfxLoader.oma2;
-	}
 
 	@Override
 	public void moveRight(int speed) {
 		location.x =location.x-speed; 
-
+		if(getLocation().x<1000)
+			isMovingDown = true;
+		if(isMovingDown)
+			moveDown();//TODO meeh...
 	}
 
 	public void moveDown() {
-		if(getLocation().x<1000)
-		location.y =location.y+3; 
 		
+		location.y =location.y+3; 
 	}
 
 	@Override
 	public String getNameAsString() {
-		// TODO Auto-generated method stub
 		return "Oma";
+	}
+
+	@Override
+	public Tile getTile(int counterVariable) {
+		return (counterVariable/8)%2 == 0 && isMovingDown ? oma1:oma2;
 	}
 
 }

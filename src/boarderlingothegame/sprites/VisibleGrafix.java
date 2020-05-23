@@ -1,10 +1,11 @@
 package boarderlingothegame.sprites;
 
 import java.awt.Point;
-import java.awt.image.BufferedImage;
+
+import glgfxinterface.Tile;
 
 public interface VisibleGrafix {
-	BufferedImage getImage(int counterVariable);
+	Tile getTile(int counterVariable);
 	/**
 	 * getLocation sollte, soweit möglich den am weitesten links oben liegenden Punkt zurückgeben
 	 * 

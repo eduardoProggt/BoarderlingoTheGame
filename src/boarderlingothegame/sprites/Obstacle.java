@@ -12,7 +12,6 @@ public abstract class Obstacle implements Collidable, VisibleGrafix {
 	
 	private String spawnedBy;
 	protected Point location;
-	public abstract BufferedImage getImage(int frame);
 	public abstract void moveRight(int speed);
 	public String getSpawnedBy() {
 		return spawnedBy;

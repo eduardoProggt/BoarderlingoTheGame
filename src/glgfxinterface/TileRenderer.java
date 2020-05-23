@@ -37,7 +37,7 @@ public class TileRenderer {
 	
 
 
-	public void renderTile(Tile tile, int x, int y, Matrix4f matrix, Window win) {
+	public void renderTile(Tile tile, int x, int y, Matrix4f matrix) {
 		y = -y;//Gl ist dumm.
 		shader.bind();
 		if (!getTileTextures().containsKey(tile.getTexture())) 
