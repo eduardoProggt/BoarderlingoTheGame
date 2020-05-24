@@ -41,7 +41,7 @@ public class GameController {
 	
 	public void calcNextFrame() {
 		int scrollGeschwindigkeit = player.getSpeedRight();
-		
+		System.out.println(scrollGeschwindigkeit);
 		drawBackground(background, scrollGeschwindigkeit);
 		drawHighScore();
 		drawPlayer();
@@ -142,7 +142,7 @@ public class GameController {
 		if(controller.leftPressed())
 			player.brake();
 		if(controller.keyVTipped()) {
-			overlay = new Fog();
+			player.boost();
 			
 		}
 	}
@@ -151,4 +151,20 @@ public class GameController {
 		return obstacles;
 	}
 
+
+	public void executeOrder(String order) {
+		switch (order) {
+		case "SCHNELLER":
+			player.boost();
+			break;
+			
+		case "NEBEL":
+			overlay = new Fog();
+			break;
+		
+		case "HINTERGRUND":
+			background.change();
+			break;
+		}
+	}
 }

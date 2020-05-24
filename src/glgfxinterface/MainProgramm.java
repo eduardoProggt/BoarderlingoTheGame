@@ -36,7 +36,7 @@ import boarderlingothegame.web.WebSocketServer;
 
 public class MainProgramm implements GfxFassade{
 	
-	private Queue<Obstacle> twitchOrders = new LinkedList<>();
+	private Queue<Object> twitchOrders = new LinkedList<>();
 	private Window win;
 	float offset = 0f;
 	int framesTillStart = 0;
@@ -97,13 +97,21 @@ public class MainProgramm implements GfxFassade{
 			
 			glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT);
 			if(!twitchOrders.isEmpty())
-				gameController.addObstacle(twitchOrders.poll());
+				computeNewTwitchOrder(gameController);
 			gameController.calcNextFrame();
 			win.swapBuffers();
 			 
 			glfwPollEvents();
 		}
 		glfwTerminate();
+	}
+
+	private void computeNewTwitchOrder(GameController gameController) {
+		//Das ist hässlich, aber selbst Urwill sagt, man kann das so machen
+		if(twitchOrders.peek() instanceof Obstacle)
+			gameController.addObstacle((Obstacle)twitchOrders.poll());
+		if(twitchOrders.peek() instanceof String)
+			gameController.executeOrder((String)twitchOrders.poll());
 	}
 
 	private void setupGL() {
@@ -127,13 +135,13 @@ public class MainProgramm implements GfxFassade{
 			twitchOrders.offer(new Granny(nameOfPurchaser));
 	
 		if(order.toUpperCase().contains("SCHNELLER")) 
-//			twitchOrders.offer("SCHNELLER");
+			twitchOrders.offer("SCHNELLER");
 			
 		if(order.toUpperCase().contains("NEBEL")) 
-//			twitchOrders.offer("NEBEL");
+			twitchOrders.offer("NEBEL");
 			
 		if(order.toUpperCase().contains("HINTERGRUND")) {
-//			twitchOrders.offer("HINTERGRUND");
+			twitchOrders.offer("HINTERGRUND");
 		}
 		
 	}

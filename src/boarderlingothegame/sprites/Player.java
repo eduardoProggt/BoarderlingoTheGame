@@ -7,11 +7,13 @@ import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
+import boarderlingothegame.AnimationTimer;
 import glgfxinterface.Tile;
 
 public class Player implements Collidable,VisibleGrafix {
 
 	private double x,y, horizontalMomentum;
+	
 	
 	private PlayerStateEnum state;
 	
@@ -140,9 +142,18 @@ public class Player implements Collidable,VisibleGrafix {
 	}
 
 	public int getSpeedRight() {
-		if(getState().equals(PlayerStateEnum.BRAKING))
-			return speedRight/2;
-		return speedRight;
+		boolean isBoosting = AnimationTimer.getInstance().getFrame("SCHNELLER") < 300;
+			
+		if(!isBoosting) {
+			if(getState().equals(PlayerStateEnum.BRAKING))
+				return speedRight/2;
+			return speedRight;
+		}
+		else{
+			if(getState().equals(PlayerStateEnum.BRAKING))
+				return (int)(2f*(float)speedRight/3f);
+			return speedRight*2;
+		}
 	}
 
 	public void setSpeedRight(int speedRight) {
@@ -213,5 +224,10 @@ public class Player implements Collidable,VisibleGrafix {
 	public void shoot() {
 		// TODO
 		System.out.println("Shoot");
+	}
+
+	public void boost() {
+		AnimationTimer.getInstance().startAnimation("SCHNELLER");
+		
 	}
 }

@@ -1,14 +1,10 @@
 package boarderlingothegame;
 
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.awt.Point;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import boarderlingothegame.sprites.VisibleGrafix;
-import java.util.Queue;
 import glgfxinterface.Tile;
 
 public class Background implements VisibleGrafix {
@@ -19,14 +15,16 @@ public class Background implements VisibleGrafix {
 	
 	public final String STADT = "Stadt";
 	public final String FELD = "Feld";
-	private Tile background = new Tile("src\\boarderlingothegame\\backgrounds\\wielandstraﬂe.png",5000,750);
-	private Tile feld = new Tile("src\\boarderlingothegame\\backgrounds\\feldBG.png",0,0); 
+	private Tile stadtBGTile = new Tile("src\\boarderlingothegame\\backgrounds\\wielandstraﬂe.png",5000,750);
+	private Tile feldBGTile = new Tile("src\\boarderlingothegame\\backgrounds\\feldBG.png",3900,750); 
+	private Tile stadtFeldTransitionBGTile = new Tile("src\\boarderlingothegame\\backgrounds\\StadtWaldTransition.png",1100,750); 
 	
 	private Queue<Tile> currentTiles = new LinkedList<>();
 	
 	public Background() {
 		location = new Point();
-//		backgroundState = STADT;
+		getCurrentTiles().offer(stadtBGTile);
+		backgroundState = STADT;
 	}
 
 	public Queue<Tile> getCurrentTiles(){
@@ -39,11 +37,18 @@ public class Background implements VisibleGrafix {
 	}
 	private void updateBackground() {
 		if(getLocation().x + getLengthOfAllCurrentTilesInPx() < 1900/*window-width*/)
-			currentTiles.add(background);//oder was auch immer
+			addNewBGTileToQueue();
 		if(getLocation().x + currentTiles.peek().getWidth() < 0) {
-			currentTiles.poll();
 			getLocation().x+=currentTiles.peek().getWidth();
+			currentTiles.poll();
 		}
+	}
+
+	private void addNewBGTileToQueue() {
+		if(backgroundState.equals(STADT))
+			currentTiles.add(stadtBGTile);
+		if(backgroundState.equals(FELD))
+			currentTiles.add(feldBGTile);
 	}
 	private int getLengthOfAllCurrentTilesInPx() {
 		int retVal = 0;
@@ -54,16 +59,6 @@ public class Background implements VisibleGrafix {
 	}
 
 	public Point getLocation() {
-//		if(firstLayerOutOfVisibleFrame()) {
-//			location.x =  -getBGImageBegin();
-//			if(state.equals(BGState.INTRANSITION))
-//				if(backgroundState == STADT)
-//					backgroundState = FELD;
-//				else if(backgroundState == FELD)
-//					backgroundState = STADT;
-//			state = BGState.REPEATING;
-//			} else if(state.equals(BGState.GOINGTOCHANGE))
-//				state = BGState.INTRANSITION;
 		return location;
 	}
 
@@ -81,5 +76,14 @@ public class Background implements VisibleGrafix {
 		return getCurrentTiles().peek();
 	}
 
+	public void change() {
+		if(backgroundState.equals(STADT)) {
+			currentTiles.add(stadtFeldTransitionBGTile);
+			backgroundState = FELD;
+		}
+		else {
+			backgroundState= STADT;
+		}
+	}
 }
 
