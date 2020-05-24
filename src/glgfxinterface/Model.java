@@ -20,6 +20,7 @@ public class Model {
 		
 		vertex_id = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vertex_id);
+		System.out.println(vertex_id);
 		glBufferData(GL_ARRAY_BUFFER, createBuffer(vertices), GL_STATIC_DRAW);
 		
 		texture_id = glGenBuffers();
@@ -28,6 +29,17 @@ public class Model {
 		
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
+	}
+	public void changeCoords(float[] vertices,float[] texture_coords) {
+		
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_id);
+		glBufferData(GL_ARRAY_BUFFER, createBuffer(vertices), GL_STATIC_DRAW);
+		
+		
+		glBindBuffer(GL_ARRAY_BUFFER, texture_id);
+		glBufferData(GL_ARRAY_BUFFER, createBuffer(texture_coords), GL_STATIC_DRAW);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	private FloatBuffer createBuffer(float[] vertices) {
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(vertices.length);

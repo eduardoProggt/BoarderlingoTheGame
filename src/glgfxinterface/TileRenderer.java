@@ -13,67 +13,34 @@ public class TileRenderer {
 	private static final Matrix4f HIGHSCOREMAT = new Matrix4f(SCOREMAT).translate(0,0.8f,0);
 	private HashMap<String, Texture> tileTextures = new HashMap<>();
 	private Model tileModel;
-	private Model scoreModel;
+
 	private Shader shader = new Shader("shader");
 	private Model highScoreModel;
+	private float[] vertices = new float[]{
+			1,1f, //Oben Rechts
+			-1,1f,//oben Links
+			1,-1f,//Unten Rechts
+			
+			1,-1f,//Unten Rechts
+			-1,1f,//oben Links
+			-1,-1f,//Unten links
+	};
+	
+	private float[] texture = new float[]{
+			1,0,
+			0,0,
+			1,1,
+			
+			1,1,
+			0,0,
+			0,1
+			};
+	
+	
 	public TileRenderer() {
-		float[] vertices = new float[]{
-				1,1f, //Oben Rechts
-				-1,1f,//oben Links
-				1,-1f,//Unten Rechts
-				
-				1,-1f,//Unten Rechts
-				-1,1f,//oben Links
-				-1,-1f,//Unten links
-		};
-		
-		float[] texture = new float[]{
-				1,0,
-				0,0,
-				1,1,
-				
-				1,1,
-				0,0,
-				0,1
-				};
 		
 		setTileModel(new Model(vertices, texture));
-		scoreModel = new Model(new float[]{
-				6f/28f,0,
-				0,0,
-				6f/28f,1,
-				
-				6f/28f,1,
-				0,0,
-				0,1
-				}, new float[]{
-						6f/28f,0,
-						0,0,
-						6f/28f,1,
-						
-						6f/28f,1,
-						0,0,
-						0,1
-						});
-		highScoreModel = new Model(new float[]{
-				0.33f,0,
-				0,0,
-				0.33f,1,
-				
-				0.33f,1,
-				0,0,
-				0,1
-				}, new float[]{
-						0.58f,0,
-						0.24f,0,
-						0.58f,1,
-						
-						0.58f,1,
-						0.24f,0,
-						0.24f,1
-						});
-		
-		
+
 	}
 	public void renderScore(HighScore highScore) {
 		//Das ist alles ganz dolle dirty.
@@ -86,21 +53,25 @@ public class TileRenderer {
 		getTileTextures().get(tile.getTexture()).bind(0);
 		shader.setUniform("sampler", 0);
 		shader.setUniform("projection", SCOREMAT);
-		scoreModel.render();
-		new Model(getKoords(7f/29f,8f/29f) , getKoords((float)(18+ highScore.getScore()/10000%10)/29f,(float)(19+ highScore.getScore()/10000%10)/29f)).render();
-		new Model(getKoords(8f/29f,9f/29f) , getKoords((float)(18+ highScore.getScore()/1000%10)/29f,(float)(19+ highScore.getScore()/1000%10)/29f)).render();
-		new Model(getKoords(9f/29f,10f/29f) , getKoords((float)(18+ highScore.getScore()/100%10)/29f,(float)(19+ highScore.getScore()/100%10)/29f)).render();
-		new Model(getKoords(10f/29f,11f/29f) , getKoords((float)(18+ highScore.getScore()/10%10)/29f,(float)(19+ highScore.getScore()/10%10)/29f)).render();
-		new Model(getKoords(11f/29f,12f/29f) , getKoords((float)(18+ highScore.getScore()%10)/29f,(float)(19+ highScore.getScore()%10)/29f)).render();
-		shader.setUniform("projection",HIGHSCOREMAT );
-		highScoreModel.render();
-		new Model(getKoords(11f/29f,12f/29f) , getKoords((float)(18+ highScore.getHighscore()/10000%10)/29f,(float)(19+ highScore.getHighscore()/10000%10)/29f)).render();
-		new Model(getKoords(12f/29f,13f/29f) , getKoords((float)(18+ highScore.getHighscore()/1000%10)/29f,(float)(19+ highScore.getHighscore()/1000%10)/29f)).render();
-		new Model(getKoords(13f/29f,14f/29f) , getKoords((float)(18+ highScore.getHighscore()/100%10)/29f,(float)(19+ highScore.getHighscore()/100%10)/29f)).render();
-		new Model(getKoords(14f/29f,15f/29f) , getKoords((float)(18+ highScore.getHighscore()/10%10)/29f,(float)(19+ highScore.getHighscore()/10%10)/29f)).render();
-		new Model(getKoords(15f/29f,16f/29f) , getKoords((float)(18+ highScore.getHighscore()%10)/29f,(float)(19+ highScore.getHighscore()%10)/29f)).render();
+		
+		getTileModel().changeCoords(getKoords(0f,6f/28f),getKoords(0f,6f/28f));
+		getTileModel().render();
 
-		//Das ist alles ganz dolle dirty.
+		for (float i = 0; i < 5; i++) {
+			int anzStellen = (int)Math.pow(10, 4-i);
+			getTileModel().changeCoords(getKoords((i+7f)/29f,(i+8f)/29f) , getKoords((float)(18+ (highScore.getScore()/anzStellen)%10)/29f,(float)(19+ (highScore.getScore()/anzStellen)%10)/29f));
+			getTileModel().render();	
+		}
+		shader.setUniform("projection",HIGHSCOREMAT );
+		getTileModel().changeCoords(getKoords(0f,0.33f),getKoords(0.24f,0.58f));
+		getTileModel().render();
+		
+		for (float i = 0; i < 5; i++) {
+			int anzStellen = (int)Math.pow(10, 4-i);
+			getTileModel().changeCoords(getKoords((i+11f)/29f,(i+12f)/29f) , getKoords((float)(18+ (highScore.getHighscore()/anzStellen)%10)/29f,(float)(19+ (highScore.getHighscore()/anzStellen)%10)/29f));
+			getTileModel().render();	
+		}
+		getTileModel().changeCoords(vertices, texture);
 	}
 	private float[] getKoords(float left, float right) {
 		return new float[]{

@@ -41,7 +41,6 @@ public class GameController {
 	
 	public void calcNextFrame() {
 		int scrollGeschwindigkeit = player.getSpeedRight();
-		System.out.println(scrollGeschwindigkeit);
 		drawBackground(background, scrollGeschwindigkeit);
 		drawHighScore();
 		drawPlayer();
@@ -80,7 +79,7 @@ public class GameController {
 	}
 
 	private void killPlayer(Iterator<Obstacle> iterator) {
-		audioPlayer.playAudio("src\\boarderlingothegame\\Sounds\\boarderlingoDamage.wav");
+		//audioPlayer.playAudio("src\\boarderlingothegame\\Sounds\\boarderlingoDamage.wav");
 		highScore.reset();
 		while(iterator.hasNext()) {
 			iterator.next().moveRight(-400);

@@ -29,16 +29,17 @@ public class Fog implements VisibleGrafix {
 			
 			if(nebelTime >= 0)
 				return new Point( 500+(50-nebelTime)*25,0);
-			
+			if(nebelTime >610)
+				return null;
 		}
 		return null;
 	}
-	public boolean stillRunning() {
-		Integer frame = AnimationTimer.getInstance().getFrame("NEBEL");
-		if(frame == null)
-			return false;
-		return frame.intValue() > 0;
-	}
+//	public boolean stillRunning() {
+//		Integer frame = AnimationTimer.getInstance().getFrame("NEBEL");
+//		if(frame == null)
+//			return false;
+//		return frame.intValue() > 0;
+//	}
 	public void resetFogTime() {
 		AnimationTimer.getInstance().resetToFrame("NEBEL",50);
 	}

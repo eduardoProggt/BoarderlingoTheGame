@@ -142,9 +142,8 @@ public class Player implements Collidable,VisibleGrafix {
 	}
 
 	public int getSpeedRight() {
-		boolean isBoosting = AnimationTimer.getInstance().getFrame("SCHNELLER") < 300;
 			
-		if(!isBoosting) {
+		if(!isBoosting()) {
 			if(getState().equals(PlayerStateEnum.BRAKING))
 				return speedRight/2;
 			return speedRight;
@@ -154,6 +153,10 @@ public class Player implements Collidable,VisibleGrafix {
 				return (int)(2f*(float)speedRight/3f);
 			return speedRight*2;
 		}
+	}
+
+	public boolean isBoosting() {
+		return AnimationTimer.getInstance().getFrame("SCHNELLER") < 300;
 	}
 
 	public void setSpeedRight(int speedRight) {
@@ -188,7 +191,7 @@ public class Player implements Collidable,VisibleGrafix {
 		}
 	}
 	public void calcJumpFrame() {
-		int bodenhoehe = 0;
+		int bodenhoehe = 20;
 		setY(getY()+getHorizontalMomentum());
 		decreaseHorizontalMomentum(-0.55);
 		
