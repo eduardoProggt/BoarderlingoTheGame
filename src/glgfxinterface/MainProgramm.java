@@ -105,7 +105,7 @@ public class MainProgramm implements GfxFassade{
 			
 			glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT);
 			if(!gameController.isPaused()) {
-				if(!twitchOrders.isEmpty() && framesPersec == 30)
+				if(!getTwitchOrders().isEmpty() && framesPersec == 30)
 					computeNewTwitchOrder(gameController);
 				gameController.calcNextFrame();
 				win.swapBuffers();
@@ -121,10 +121,10 @@ public class MainProgramm implements GfxFassade{
 
 	private void computeNewTwitchOrder(GameController gameController) {
 		//Das ist hässlich, aber selbst Urwill sagt, man kann das so machen
-		if(twitchOrders.peek() instanceof Obstacle)
-			gameController.addObstacle((Obstacle)twitchOrders.poll());
-		if(twitchOrders.peek() instanceof String)
-			gameController.executeOrder((String)twitchOrders.poll());
+		if(getTwitchOrders().peek() instanceof Obstacle)
+			gameController.addObstacle((Obstacle)getTwitchOrders().poll());
+		if(getTwitchOrders().peek() instanceof String)
+			gameController.executeOrder((String)getTwitchOrders().poll());
 	}
 
 	private void setupGL() {
@@ -139,24 +139,30 @@ public class MainProgramm implements GfxFassade{
 	@Override
 	public void handleNewTwitchOrder(String order, String nameOfPurchaser) {
 		if(order.toUpperCase().contains("KAKTUS"))
-			twitchOrders.offer(new Cactus(nameOfPurchaser));
+			getTwitchOrders().offer(new Cactus(nameOfPurchaser));
 		
 		if(order.toUpperCase().contains("HELI"))
-			twitchOrders.offer(new Heli(nameOfPurchaser));
+			getTwitchOrders().offer(new Heli(nameOfPurchaser));
 		
 		if(order.toUpperCase().contains("OMA"))
-			twitchOrders.offer(new Granny(nameOfPurchaser));
+			getTwitchOrders().offer(new Granny(nameOfPurchaser));
 	
 		if(order.toUpperCase().contains("SCHNELLER")) 
-			twitchOrders.offer("SCHNELLER");
+			getTwitchOrders().offer("SCHNELLER");
 			
 		if(order.toUpperCase().contains("NEBEL")) 
-			twitchOrders.offer("NEBEL");
+			getTwitchOrders().offer("NEBEL");
 			
 		if(order.toUpperCase().contains("HINTERGRUND")) {
-			twitchOrders.offer("HINTERGRUND");
+			getTwitchOrders().offer("HINTERGRUND");
 		}
-		
+		if(order.toUpperCase().contains("KUGEL")) {
+			getTwitchOrders().offer("KUGEL");
+		}
+	}
+
+	public Queue<Object> getTwitchOrders() {
+		return twitchOrders;
 	}
 
 }

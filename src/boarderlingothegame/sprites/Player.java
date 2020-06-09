@@ -24,7 +24,8 @@ public class Player implements Collidable,VisibleGrafix {
 	private Tile idleRight2= new Tile("src\\boarderlingothegame\\gfx\\blingo_right2.png",350,600); 
 	private Tile brake1= new Tile("src\\boarderlingothegame\\gfx\\bremsen1.png",350,600); 
 	private Tile brake2= new Tile("src\\boarderlingothegame\\gfx\\bremsen2.png",350,600); 
-	private Tile ducking = new Tile("src\\boarderlingothegame\\gfx\\blingo_ducking.png",350,600);
+	private Tile ducking1 = new Tile("src\\boarderlingothegame\\gfx\\blingo_ducking.png",350,600);
+	private Tile ducking2 = new Tile("src\\boarderlingothegame\\gfx\\blingo_ducking2.png",350,600);
 	private Tile jumping = new Tile("src\\boarderlingothegame\\gfx\\blingo_jump.png",350,600);
 	
 	public Player(){
@@ -99,24 +100,39 @@ public class Player implements Collidable,VisibleGrafix {
 	} 
 
 	public Tile getTile(int counterVariable) {
-		if(getState().equals(PlayerStateEnum.IDLE)) {
+		if(getState().equals(PlayerStateEnum.IDLE)) 
+			return getIdleTile(counterVariable);
+		
+		if(isInAir())
+			return jumping;
+		if(getState().equals(PlayerStateEnum.DUCKING))
+			return getDuckingTile(counterVariable);	
+		if(getState().equals(PlayerStateEnum.BRAKING)) {
+			return getBrakingTile(counterVariable);
+		}
+		
+		return idleRight1; //Default
+	}
+
+	public Tile getDuckingTile(int counterVariable) {
+		if (counterVariable % 3 == 0 | counterVariable % 5 == 0)
+			return ducking1; 
+		else
+			return ducking2;
+	}
+
+	public Tile getBrakingTile(int counterVariable) {
+		if (counterVariable % 3 == 0 | counterVariable % 5 == 0)
+			return brake1; 
+		else
+			return brake2;
+	}
+
+	public Tile getIdleTile(int counterVariable) {
 		if (counterVariable % 3 == 0 | counterVariable % 5 == 0)
 			return idleRight1;
 		else
 			return idleRight2;
-		}
-		if(isInAir())
-			return jumping;
-		if(getState().equals(PlayerStateEnum.DUCKING))
-			return ducking;	
-		if(getState().equals(PlayerStateEnum.BRAKING)) {
-			if (counterVariable % 3 == 0 | counterVariable % 5 == 0)
-				return brake1; // set image
-			else
-				return brake2;
-		}
-		
-		return idleRight1; //Default
 	}
 	
 	public double getX() {
@@ -242,5 +258,10 @@ public class Player implements Collidable,VisibleGrafix {
 	}
 	public void resetBullets() {
 		bullets = 3;
+	}
+
+	public void giveBullet() {
+		bullets++;
+		bullets = bullets % 6;//Gameplayelement: Wenn der Player mehr als 5 Kugeln hat, hat er 0
 	}
 }

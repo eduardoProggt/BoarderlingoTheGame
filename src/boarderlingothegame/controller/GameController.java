@@ -164,11 +164,11 @@ public class GameController {
 	}
 
 	private void drawBackground(Background background, int scrollGeschwindigkeit) {
-		int x = background.getLocation().x;
+		int xBackgroundPos = background.getLocation().x;
 		for (Tile tile : background.getCurrentTiles()) {
-			renderer.renderTile(tile,x, -100,  new Matrix4f());
-			x+= tile.getWidth();
-			if(x>Window.getInstance().getWidth())
+			renderer.renderTile(tile,xBackgroundPos, -100,  new Matrix4f());
+			xBackgroundPos+= tile.getWidth();
+			if(xBackgroundPos>Window.getInstance().getWidth())
 				break;
 		}
 		background.move(scrollGeschwindigkeit);
@@ -188,11 +188,11 @@ public class GameController {
 			player.brake();
 		if(controller.keyVTipped()) {
 			hallOfFameWindow.update("TEst"+(int)(Math.random()*10));
-			
+			player.giveBullet();
 		}
 	}
 
-	private Queue<Obstacle> getObstacles() {
+	private synchronized Queue<Obstacle> getObstacles() {
 		return obstacles;
 	}
 
@@ -210,6 +210,10 @@ public class GameController {
 		case "HINTERGRUND":
 			background.change();
 			break;
+		
+		case "KUGEL":
+			player.giveBullet();
+			break;
 		}
 	}
 
@@ -217,8 +221,8 @@ public class GameController {
 	public boolean isPaused() {
 		return paused;
 	}
-	public void setPaused(boolean b) {
-		paused = b;
+	public void setPaused(boolean psed) {
+		paused = psed;
 		
 	}
 }
