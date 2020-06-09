@@ -10,11 +10,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import javax.swing.JOptionPane;
+
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import boarderlingothegame.AnimationTimer;
 import boarderlingothegame.AudioPlayer;
 import boarderlingothegame.Background;
+import boarderlingothegame.halloffame.HallOfFameWindow;
+import boarderlingothegame.sprites.Bullet;
 import boarderlingothegame.sprites.Cactus;
 import boarderlingothegame.sprites.Fog;
 import boarderlingothegame.sprites.Granny;
@@ -38,6 +43,10 @@ public class GameController {
 	private HighScore highScore = new HighScore();
 	private VisibleGrafix overlay = null;
 	private int framesTillStart = 0;
+	private Bullet bullet;
+	private HallOfFameWindow hallOfFameWindow = new HallOfFameWindow();
+	private boolean paused;
+	
 	
 	public void calcNextFrame() {
 		int scrollGeschwindigkeit = player.getSpeedRight();
@@ -48,10 +57,26 @@ public class GameController {
 		updateObstacles(scrollGeschwindigkeit);
 		deleteObsoleteObstacles();
 		drawObstacles();
+		drawBullet();
 		drawOverlay();
 
 		framesTillStart++;
 		AnimationTimer.getInstance().increment();
+	}
+
+
+	private void drawBullet() {
+		
+		for (int i = 0; i < player.getBullets(); i++) {
+			renderer.renderTile(bullet.image,30,110+(i*30) , new Matrix4f());
+
+		}
+		
+		if(bullet != null) {
+			renderer.renderTile(bullet.getTile(framesTillStart), (int)bullet.getLocation().getX(),(int)bullet.getLocation().getY(), new Matrix4f());
+			bullet.move();
+		}
+		
 	}
 
 
@@ -69,23 +94,42 @@ public class GameController {
 	private void updateObstacles(int scrollGeschwindigkeit) {
 		for (Iterator<Obstacle> iterator = getObstacles().iterator(); iterator.hasNext();) {
 			Obstacle obstacle = iterator.next();
+
+			collideWithBullet(iterator, obstacle);
+			
 			obstacle.moveRight(scrollGeschwindigkeit);
 			if(collisionDetection(obstacle.getHitBox(), player.getHitBox())) {
 				iterator.remove();
-				killPlayer(iterator);
+				killPlayer(iterator, obstacle);
 				break;
 			}
+				
 		}
 	}
 
-	private void killPlayer(Iterator<Obstacle> iterator) {
+
+	public void collideWithBullet(Iterator<Obstacle> iterator, Obstacle obstacle) {
+		if(bullet != null && collisionDetection(obstacle.getHitBox(), bullet.getHitBox())) {
+			bullet = null;
+			iterator.remove();
+		}
+	}
+
+	private void killPlayer(Iterator<Obstacle> iterator, Obstacle obstacle) {
+		Tile tot = new Tile("src\\boarderlingothegame\\gfx\\tot.png", 858, 540);
+		renderer.renderTile(tot, 500, 50, new Matrix4f());
+		player.resetBullets();
+		setPaused(true);
+		hallOfFameWindow.update(obstacle.getSpawnedBy());
 		//audioPlayer.playAudio("src\\boarderlingothegame\\Sounds\\boarderlingoDamage.wav");
 		highScore.reset();
 		while(iterator.hasNext()) {
-			iterator.next().moveRight(-400);
+			iterator.next().moveRight(-700);
 			
 		}
 	}
+
+
 	private void deleteObsoleteObstacles() {
 		if(!getObstacles().isEmpty() && getObstacles().peek().getLocation().getX()<-500)
 			getObstacles().poll();
@@ -124,6 +168,8 @@ public class GameController {
 		for (Tile tile : background.getCurrentTiles()) {
 			renderer.renderTile(tile,x, -100,  new Matrix4f());
 			x+= tile.getWidth();
+			if(x>Window.getInstance().getWidth())
+				break;
 		}
 		background.move(scrollGeschwindigkeit);
 	}
@@ -135,13 +181,13 @@ public class GameController {
 			player.duck();
 		if(controller.spaceTipped())
 			if(player.getState().equals(PlayerStateEnum.DUCKING))
-				player.shoot();
+				bullet = player.shoot();
 			else
 				player.jump();
 		if(controller.leftPressed())
 			player.brake();
 		if(controller.keyVTipped()) {
-			player.boost();
+			hallOfFameWindow.update("TEst"+(int)(Math.random()*10));
 			
 		}
 	}
@@ -165,5 +211,14 @@ public class GameController {
 			background.change();
 			break;
 		}
+	}
+
+
+	public boolean isPaused() {
+		return paused;
+	}
+	public void setPaused(boolean b) {
+		paused = b;
+		
 	}
 }

@@ -10,7 +10,7 @@ import glgfxinterface.Tile;
 public class Bullet implements Collidable, VisibleGrafix {
 
 	Point location;
-	Tile image = new Tile("src\\boarderlingothegame\\gfx\\Bullet.png", 20, 10);
+	public static Tile image = new Tile("src\\boarderlingothegame\\gfx\\Bullet.png", 20, 10);
 	
 	public Bullet() {
 		location = new Point(400,500);

@@ -1,5 +1,5 @@
 package glgfxinterface;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwGetKey;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -85,9 +85,17 @@ public class MainProgramm implements GfxFassade{
 				if(glfwGetKey(win.getWinId(),GLFW_KEY_ESCAPE) == GL_TRUE)
 					glfwSetWindowShouldClose(win.getWinId(), true);
 				gameController.processInput();
+				
 			}
-			if(!canRender)
+			if(!canRender) {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				continue;
+			}
 			framesPersec++;
 			if(System.currentTimeMillis() - einstiegszeit > 1000) {
 				einstiegszeit = System.currentTimeMillis();
@@ -96,12 +104,17 @@ public class MainProgramm implements GfxFassade{
 			}
 			
 			glClear(GL_COLOR_BUFFER_BIT  | GL_DEPTH_BUFFER_BIT);
-			if(!twitchOrders.isEmpty())
-				computeNewTwitchOrder(gameController);
-			gameController.calcNextFrame();
-			win.swapBuffers();
-			 
+			if(!gameController.isPaused()) {
+				if(!twitchOrders.isEmpty() && framesPersec == 30)
+					computeNewTwitchOrder(gameController);
+				gameController.calcNextFrame();
+				win.swapBuffers();
+			}
+			else if(glfwGetKey(win.getWinId(),GLFW_KEY_ENTER) == GL_TRUE)
+				gameController.setPaused(false);
+			
 			glfwPollEvents();
+
 		}
 		glfwTerminate();
 	}

@@ -17,7 +17,7 @@ public class Player implements Collidable,VisibleGrafix {
 	
 	private PlayerStateEnum state;
 	
-	private int speedRight;
+	private int speedRight, bullets;
 	private final int SPRUNGKRAFT = 20;
 
 	private Tile idleRight1 = new Tile("src\\boarderlingothegame\\gfx\\blingo_right.png",350,600); 
@@ -28,6 +28,7 @@ public class Player implements Collidable,VisibleGrafix {
 	private Tile jumping = new Tile("src\\boarderlingothegame\\gfx\\blingo_jump.png",350,600);
 	
 	public Player(){
+		bullets= 3;
 		setX(10);
 		setY(20);
 		setState(PlayerStateEnum.IDLE);
@@ -224,13 +225,22 @@ public class Player implements Collidable,VisibleGrafix {
 		
 	}
 
-	public void shoot() {
-		// TODO
-		System.out.println("Shoot");
+	public Bullet shoot() {
+		if(getBullets() < 1)
+			return null;
+		bullets = getBullets() - 1;
+		return new Bullet();
 	}
 
 	public void boost() {
 		AnimationTimer.getInstance().startAnimation("SCHNELLER");
 		
+	}
+
+	public int getBullets() {
+		return bullets;
+	}
+	public void resetBullets() {
+		bullets = 3;
 	}
 }
